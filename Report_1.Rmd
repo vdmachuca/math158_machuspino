@@ -7,21 +7,38 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(skimr)
+library(ggplot2)
+library(dplyr)
+library(broom)
+library(mosaic)
 ```
 
-```{r}
-library(readr)
-student_mat <- read_delim("~/Desktop/student/student-mat.csv", 
-    ";", escape_double = FALSE, trim_ws = TRUE)
-View(student_mat)
-
-library(readr)
-student_por <- read_delim("~/Desktop/student/student-por.csv", 
-    ";", escape_double = FALSE, trim_ws = TRUE)
-View(student_por)
-```
 
 
 ```{r}
 student_both<-merge(student_mat,student_por,by=c("school","sex","age","address","famsize","Pstatus","Medu","Fedu","Mjob","Fjob","reason","nursery","internet"))
 ```
+
+```{r}
+skim(student_por)
+```
+
+Let's take a look at the distributions of grades with the following histograms. 
+
+```{r}
+ggplot(student_por, aes(x=G1)) + geom_histogram() + labs(x="First Period Grade")
+
+ggplot(student_por, aes(x=G2)) + geom_histogram() + labs(x="Second Period Grade")
+
+ggplot(student_por, aes(x=G3)) + geom_histogram() + labs(x="Final Grade")
+
+```
+
+The distributions of each grade seem to be symmetric which is to be expected with grades. What about freetime 
+
+
+
+
+
+
