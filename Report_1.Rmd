@@ -13,16 +13,28 @@ library(dplyr)
 library(broom)
 library(mosaic)
 library(readr)
+require(gridExtra)
 ```
 
 
 
-```{r, echo=FALSE}
+```{r, include=FALSE}
 student_por <- read_delim("~/Desktop/math158_machuspino/student-por.csv", 
     ";", escape_double = FALSE, trim_ws = TRUE)
 student_mat <- read_delim("~/Desktop/math158_machuspino/student-mat.csv", 
     ";", escape_double = FALSE, trim_ws = TRUE)
 ```
+This data looks at secondary education student achievement in a math course and portuguese course at two Portuguese schools. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. 
+
+The dataset includes demographic variables like student’s school name (binary), sex (binary), age (numeric), and whether the student lives in an urban or rural area. 
+
+It also includes variables that relate to family, including family size, parents cohabitation status (living apart or together), mother and father’s education (ordinal), mother and father’s job ('teacher', 'health' care related, civil 'services' (e.g. administrative or police), 'at_home' or 'other'), student’s guardian (mother, father or other), and quality of family relations (1 being very bad to 5 being excellent). 
+
+School-related variables include home to school travel time (ordinal), weekly study time (ordinal), and number of past class failures (1-3 if n<3, 4 otherwise). For each of two courses, students were given a graded after the first and second period as well as a final grade.  
+
+Academic routine, habits and performance were also measured. These variables included travel time from home to school (nominal), weekly study time (nominal), number of past class failures (nominal), reason to choose school (categorical), and number of absences (numeric). Additionally, educational resources were assessed through binary measurements of extra educational support, family educational support, extra paid classes within the course subject, extracurricular activities, attended nursery school, college aspiration, and home internet access.
+
+Finally, nominal variables that measured more personal aspect of life included frequency of outings with friends, workday alcohol consumption, weekend alcohol consumption, current health status, and being in a romantic relationship (binary). 
 
 ```{r}
 student_both<-merge(student_mat,student_por,by=c("school","sex","age","address","famsize","Pstatus","Medu","Fedu","Mjob","Fjob","reason","nursery","internet"))
@@ -32,13 +44,11 @@ ncol(student_both)
 Let's take a look at the distributions of grades with the following histograms. 
 
 ```{r}
-require(gridExtra)
-
-first <- ggplot(student_por, aes(x=G1)) + geom_histogram() + labs(x="First Period Grade")
+first <- ggplot(student_por, aes(x=G1), na.rm=TRUE) + geom_histogram() + labs(x="First Period Grade") + stat_bin(binwidth = 25)
 
 second <- ggplot(student_por, aes(x=G2)) + geom_histogram() + labs(x="Second Period Grade")
 
-final <- ggplot(student_por, aes(x=G3)) + geom_histogram() + labs(x="Final Grade")
+final <- ggplot(student_por, aes(x=G3)) + geom_histogram() + labs(x="Final Grade") 
 
 grid.arrange(first, second, final, ncol=3)
 ```
@@ -63,7 +73,11 @@ The travel time variable is coded as follows:  1 - travel 15 minutes, 2 - travel
 ggplot(student_por, aes(absences, G3)) + geom_point(aes(color=famrel)) + labs(col="Family Relations") + geom_smooth(method='lm')
 ```
 
-Intuitevely, we would assume that as number of absences increase, a student's final grade would decrease. While this trend exists, it is not very prominent in our data, as shown by the regression line in our dot plot above. 
+Intuitevely, we would assume that as number of absences increase, a student's final grade would decrease. While this trend exists, it is not very prominent in our data, as shown by the regression line with a slope close to 0 above. Additionally, quality of family relations are pretty randomly spread across the dotplot above, so there are no immediately visible trends as they relate absences and final grades.
+
+```{r}
+skim(student_por)
+```
 
 
 

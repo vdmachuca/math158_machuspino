@@ -1,0 +1,113 @@
+\documentclass{article}
+
+
+
+\usepackage{url}
+\usepackage{graphicx,subfig}
+\usepackage{float}
+\usepackage{fullpage}
+\usepackage{graphicx} 
+\setkeys{Gin}{width=1in} 
+
+
+
+\title{Report 1}
+\author{Vanessa Machuca and Luis Espino}
+
+
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\maketitle
+
+
+
+
+
+<<echo=FALSE>>=
+knitr::opts_chunk$set(echo = TRUE)
+library(skimr)
+library(ggplot2)
+library(dplyr)
+library(broom)
+library(mosaic)
+library(readr)
+require(gridExtra)
+@
+
+<<echo=FALSE>>=
+student_por <- read_delim("~/Desktop/math158_machuspino/student-por.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+student_mat <- read_delim("~/Desktop/math158_machuspino/student-mat.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+@
+
+This data looks at student achievement in a math course and portuguese course at two secondary education Portuguese schools. A dataset is provided for each course and there are approximately 393 students that overlap with both. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. 
+
+The dataset includes demographic variables like student school name (binary), sex (binary), age (numeric), and whether the student lives in an urban or rural area. 
+
+It also includes variables that relate to family, including family size, parents cohabitation status (living apart or together), mother and father education (ordinal), mother and father job (teacher, health care related, civil services (e.g. administrative or police), at home or other), student guardian (mother, father or other), and quality of family relations ($1$ being very bad to $5$ being excellent). 
+
+School-related variables include home to school travel time (ordinal), weekly study time (ordinal), and number of past class failures ($1-3$ if $n<3$, $4$ otherwise). For each of two courses, students were given a graded after the first and second period as well as a final grade.  
+
+Academic routine, habits and performance were also measured. These variables included travel time from home to school (nominal), weekly study time (nominal), number of past class failures (nominal), reason to choose school (categorical), and number of absences (numeric). Additionally, educational resources were assessed through binary measurements of extra educational support, family educational support, extra paid classes within the course subject, extracurricular activities, attended nursery school, college aspiration, and home internet access.
+
+Finally, nominal variables that measured more personal aspect of life included frequency of outings with friends, workday alcohol consumption, weekend alcohol consumption, current health status, and being in a romantic relationship (binary). 
+
+For the purposes of this assignment, we will only look at the observations for students in the portuguese course, since more students took this course.\\ 
+
+Let us take a look at the distributions of grades with the following histograms. 
+
+\begin{center}
+<<fig=TRUE, height=2, echo=FALSE>>=
+first <- ggplot(student_por, aes(x=G1), na.rm=TRUE) + geom_histogram() + labs(x="First Period Grade") 
+
+second <- ggplot(student_por, aes(x=G2)) + geom_histogram() + labs(x="Second Period Grade")
+
+final <- ggplot(student_por, aes(x=G3)) + geom_histogram() + labs(x="Final Grade") 
+
+grid.arrange(first, second, final, ncol=3)
+@
+\end{center}
+
+The distributions of each grade seem to be symmetric which is to be expected with grades.
+
+\begin{center}
+<<fig=TRUE, height=3>>=
+ggplot(student_por, aes(G3)) + geom_histogram(aes(color=school)) + facet_wrap('sex') + theme(legend.title = element_text(size=10,face="bold")) +  labs(x="Final Grade by Sex")
+@
+\end{center}
+Similarly, the distributions for final grades are fairly symmetric by sex. The range of grades for each is identical and they also both have a few outliers with a final grade of $0$. Moreover, notice that students from Gabriel Pereira (GP) make up a larger proportion of the sample than students from  Mousinho da Silveira (MS).
+
+\begin{center}
+<<fig=TRUE, height=3>>=
+ggplot(student_por, aes(traveltime)) + geom_histogram(aes()) + facet_wrap('address') + theme(legend.title = element_text(size=10,face="bold")) +  labs(x="Travel Time by Home Address Type (rural or urban)")
+@
+\end{center}
+
+The travel time variable is coded as follows:  $1$ - travel $15$ minutes, $2$ - travel $15$ to $30$ minutes, $3$ - travel $30$ minutes to $1$ hour, or $4$ - travel over an hour. Observe that the majority of people who traveled about $15$ minutes live in an urban environment. Perhaps this is due to school placement in an urban setting. 
+
+\begin{center}
+<<fig=TRUE, height=3>>=
+ggplot(student_por, aes(absences, G3)) + geom_point(aes(color=famrel)) + labs(col="Family Relations") + geom_smooth(method='lm')+ labs(y="Final Grade") 
+@
+\end{center}
+
+Intuitevely, we would assume that as number of absences increase, a decrease in student final grade. While this trend exists, it is not very prominent in our data, as shown by the regression line with a slope close to $0$ above. Additionally, quality of family relations is pretty randomly spread across the dotplot above, so there are no immediately visible trends as they relate absences and final grades.
+
+<<>>=
+table(student_por$famsup, student_por$paid)
+@
+
+It is interesting to note that people not supported by family in their education varied in terms of having extra paid lessons for the course or not. I would assume that there would be more of a correlation betweeen family support and having paid classes. 
+
+<<echo=FALSE>>=
+skim(student_por) 
+@
+
+Although our compiled PDF does not show it (could not find the appropriate font), the histograms for age, grades 1, 2, and 3, and weekend alcohol consumption all seem relatively symmetric. The distributions of all other variables are either skewed or relatively level across different levels of that variable. 
+
+Additionally, note that while the range of student ages is 15-22, most students were on the younger side, with an average age of 16.74. Most students are on the more positive side of health and on the lower extremes of studytime, travel time, weekly alcohol consumption, workday alcohol consumption, number of absences, and failures. The remaining variables we relatively even across the board. 
+
+While the sample size is fairly large, we do not know that participants were randomly chosen. Thus, we cannot rule out the possibility of bias in our data. Additionally, this would only be generalizable to the population of students at these two schools taking these courses. 
+\end{document}
