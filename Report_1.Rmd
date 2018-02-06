@@ -12,30 +12,58 @@ library(ggplot2)
 library(dplyr)
 library(broom)
 library(mosaic)
+library(readr)
 ```
 
 
+
+```{r, echo=FALSE}
+student_por <- read_delim("~/Desktop/math158_machuspino/student-por.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+student_mat <- read_delim("~/Desktop/math158_machuspino/student-mat.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+```
 
 ```{r}
 student_both<-merge(student_mat,student_por,by=c("school","sex","age","address","famsize","Pstatus","Medu","Fedu","Mjob","Fjob","reason","nursery","internet"))
-```
-
-```{r}
-skim(student_por)
+ncol(student_both)
 ```
 
 Let's take a look at the distributions of grades with the following histograms. 
 
 ```{r}
-ggplot(student_por, aes(x=G1)) + geom_histogram() + labs(x="First Period Grade")
+require(gridExtra)
 
-ggplot(student_por, aes(x=G2)) + geom_histogram() + labs(x="Second Period Grade")
+first <- ggplot(student_por, aes(x=G1)) + geom_histogram() + labs(x="First Period Grade")
 
-ggplot(student_por, aes(x=G3)) + geom_histogram() + labs(x="Final Grade")
+second <- ggplot(student_por, aes(x=G2)) + geom_histogram() + labs(x="Second Period Grade")
 
+final <- ggplot(student_por, aes(x=G3)) + geom_histogram() + labs(x="Final Grade")
+
+grid.arrange(first, second, final, ncol=3)
 ```
 
-The distributions of each grade seem to be symmetric which is to be expected with grades. What about freetime 
+The distributions of each grade seem to be symmetric which is to be expected with grades. 
+
+
+```{r}
+ggplot(student_por, aes(G3)) + geom_histogram(aes(color=school)) + facet_wrap('sex') + theme(legend.title = element_text(size=10,face="bold")) +  labs(x="Final Grade by Sex")
+```
+
+Similarly, the distributions for final grades are fairly symmetric by sex. The range of grades for each is identical and they also both have a few outliers with a final grade of 0. Moreover, notice that students from Gabriel Pereira (GP) make up a larger proportion of the sample than students from  Mousinho da Silveira (MS). 
+
+```{r}
+ggplot(student_por, aes(traveltime)) + geom_histogram(aes()) + facet_wrap('address') + theme(legend.title = element_text(size=10,face="bold")) +  labs(x="Travel Time by Home Address Type (rural or urban)")
+```
+
+The travel time variable is coded as follows:  1 - travel 15 minutes, 2 - travel 15 to 30 minutes, 3 - travel 30 minutes to 1 hour, or 4 - travel over an hour. Observe that the majority of people who traveled about 15 minutes live in an urban environment. Perhaps this is due to the school's placement in an urban setting. 
+
+
+```{r}
+ggplot(student_por, aes(absences, G3)) + geom_point(aes(color=famrel)) + labs(col="Family Relations") + geom_smooth(method='lm')
+```
+
+Intuitevely, we would assume that as number of absences increase, a student's final grade would decrease. While this trend exists, it is not very prominent in our data, as shown by the regression line in our dot plot above. 
 
 
 
