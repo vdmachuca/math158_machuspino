@@ -18,14 +18,14 @@ require(gridExtra)
 
 Our hypothesis is that a linear relationship exists between number of absences (absences) and final grade (G3). More specifically, we’d predict that a negative relationship exists between the two.  
 
-Below is a plot of absences vs. final grade 
+absences vs. final grade 
 
 ```{r, eval=FALSE}
 ggplot(student_por, aes(absences, G3)) + geom_point() 
 ```
 
 
-And here is a plot of hte residuals vs. predicted.
+residuals vs. predicted.
 
 ```{r, eval=FALSE}
 ggplot(student_por, aes(absences, G3)) + geom_point() 
