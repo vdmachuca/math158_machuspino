@@ -5,7 +5,7 @@ date: "2/12/2018"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
+```{r global_options, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(skimr)
 library(ggplot2)
@@ -14,6 +14,8 @@ library(broom)
 library(mosaic)
 library(readr)
 library(lattice)
+library(investr)
+library(robustbase)
 require(gridExtra)
 ```
 
@@ -71,4 +73,154 @@ summary(filteredG3_lm)$r.squared
 
 We get an $R^2$ value of 0.013. This tells us that number of absences explains 1.3% of variability in final grades - quite a small percentage. 
 We expected a stronger linear relationship between number of absences and final grade. That said, it's safe to say that number absences is likely related to other variables in the data set. In the future, then, we'd like to explore colinearity between absences and other variables like travel time, number of past class failures, and quality of family relationships.  We are interesting in exploring the relationship between parent education and student school performance. The former may indicate whether or not a student who grew up in a family environment that promotes education, which might affect that student's performance. 
+
+### Simultaneous Inference
+
+```{r, eval=FALSE}
+working.hotelling.bonferroni.intervals <- function(x, y) {
+  y <- as.matrix(y)
+  x <- as.matrix(x)
+  n <- length(y)
+
+  # Get the fitted values of the linear model
+  fit <- lm(y ~ x)
+  fit <- fit$fitted.values
+  
+  # Find standard error as defined above
+  se <- sqrt(sum((y - fit)^2) / (n - 2)) * 
+    sqrt(1 / n + (x - mean(x))^2 / 
+           sum((x - mean(x))^2))
+
+  # Calculate B and W statistics for both procedures.
+  W <- sqrt(2 * qf(p = 0.95, df1 = 2, df2 = n - 2))
+  B <- 1-qt(.95/(2 * 3), n - 2)
+  N <- 1-qt(.95/2, n - 2)
+
+  # Compute the simultaneous confidence intervals
+  
+  # Working-Hotelling
+  wh.upper <- fit + W * se
+  wh.lower <- fit - W * se
+  
+  # Bonferroni
+  bon.upper <- fit + B * se
+  bon.lower <- fit - B * se
+  
+  # unadjusted
+  non.upper <- fit + N * se
+  non.lower <- fit - N * se
+  
+  xy <- data.frame(cbind(x,y))
+  
+  # Plot the Working-Hotelling intervals
+  wh <- ggplot(xy, aes(x=x, y=y)) + 
+    geom_point(size=2.5) + 
+    geom_line(aes(y=fit, x=x), size=1) + 
+    geom_line(aes(x=x, y=wh.upper), colour='blue', linetype='dashed', size=1) + 
+    geom_line(aes(x=x, wh.lower), colour='blue', linetype='dashed', size=1) +
+    labs(title='Working-Hotelling')
+  
+  # Plot the Bonferroni intervals
+  bonn <- ggplot(xy, aes(x=x, y=y)) + 
+    geom_point(size=2.5) + 
+    geom_line(aes(y=fit, x=x), size=1) + 
+    geom_line(aes(x=x, y=bon.upper), colour='blue', linetype='dashed', size=1) + 
+    geom_line(aes(x=x, bon.lower), colour='blue', linetype='dashed', size=1) +
+    labs(title='Bonferroni')
+  
+  # Plot the unadjusted intervals
+  non <- ggplot(xy, aes(x=x, y=y)) + 
+    geom_point(size=2.5) + 
+    geom_line(aes(y=fit, x=x), size=1) + 
+    geom_line(aes(x=x, y=non.upper), colour='blue', linetype='dashed', size=1) + 
+    geom_line(aes(x=x, non.lower), colour='blue', linetype='dashed', size=1) +
+    labs(title='Unadjusted')
+  
+  
+  grid.arrange(non, wh, bonn, ncol = 3)
+  
+  # Collect results of procedures into a data.frame and return
+  res <- data.frame(round(cbind(N, W, B), 3), row.names = c('Result'))
+  colnames(res) <- c('N', 'W', 'B')
+  
+  return(res)
+}
+
+working.hotelling.bonferroni.intervals(student_porfiltered$absences, student_porfiltered$G3)
+```
+
+
+```{r, eval=FALSE, echo=FALSE, fig.keep=TRUE}
+working.hotelling.bonferroni.pintervals <- function(x, y) {
+  y <- as.matrix(y)
+  x <- as.matrix(x)
+  n <- length(y)
+
+  # Get the fitted values of the linear model
+  fit <- lm(y ~ x)
+  fit <- fit$fitted.values
+  
+  # Find standard error as defined above
+  se <- sqrt(sum((y - fit)^2) / (n - 2)) * 
+    sqrt(1+(1 / n) + (x - mean(x))^2 / 
+           sum((x - mean(x))^2))
+
+  # Calculate B and W statistics for both procedures.
+  W <- sqrt(2 * qf(p = 0.95, df1 = 2, df2 = n - 2))
+  B <- 1-qt(.95/(2 * 3), n - 2)
+  N <- 1-qt(.95/2, n - 2)
+
+  # Compute the simultaneous confidence intervals
+  
+  # Working-Hotelling
+  wh.upper <- fit + W * se
+  wh.lower <- fit - W * se
+  
+  # Bonferroni
+  bon.upper <- fit + B * se
+  bon.lower <- fit - B * se
+  
+  # unadjusted
+  non.upper <- fit + N * se
+  non.lower <- fit - N * se
+  
+  xy <- data.frame(cbind(x,y))
+  
+  # Plot the Working-Hotelling intervals
+  wh <- ggplot(xy, aes(x=x, y=y)) + 
+    geom_point(size=2.5) + 
+    geom_line(aes(y=fit, x=x), size=1) + 
+    geom_line(aes(x=x, y=wh.upper), colour='blue', linetype='dashed', size=1) + 
+    geom_line(aes(x=x, wh.lower), colour='blue', linetype='dashed', size=1) +
+    labs(title='Working-Hotelling')
+  
+  # Plot the Bonferroni intervals
+  bonn <- ggplot(xy, aes(x=x, y=y)) + 
+    geom_point(size=2.5) + 
+    geom_line(aes(y=fit, x=x), size=1) + 
+    geom_line(aes(x=x, y=bon.upper), colour='blue', linetype='dashed', size=1) + 
+    geom_line(aes(x=x, bon.lower), colour='blue', linetype='dashed', size=1) +
+    labs(title='Bonferroni')
+  
+  # Plot the unadjusted intervals
+  non <- ggplot(xy, aes(x=x, y=y)) + 
+    geom_point(size=2.5) + 
+    geom_line(aes(y=fit, x=x), size=1) + 
+    geom_line(aes(x=x, y=non.upper), colour='blue', linetype='dashed', size=1) + 
+    geom_line(aes(x=x, non.lower), colour='blue', linetype='dashed', size=1) +
+    labs(title='Unadjusted')
+  
+  grid.arrange(non, wh, bonn, ncol = 3)
+  
+  # Collect results of procedures into a data.frame and return
+  res <- data.frame(round(cbind(N, W, B), 3), row.names = c('Result'))
+  colnames(res) <- c('N', 'W', 'B')
+  
+  return(res)
+}
+
+working.hotelling.bonferroni.pintervals(student_porfiltered$absences, student_porfiltered$G3)
+
+```
+```
 
