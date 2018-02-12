@@ -222,5 +222,7 @@ working.hotelling.bonferroni.pintervals <- function(x, y) {
 working.hotelling.bonferroni.pintervals(student_porfiltered$absences, student_porfiltered$G3)
 
 ```
-```
+
+
+The level of significance, $\alpha$, and power for a single test differs from the level of significance and power for a family of tests. For example, t-statistics based on the same sample data and MSE will be dependent on each other. Adjusting for multiple comparisons allows us to more accurately determine the actual level of significance and power for a family of tests and thus decreases the likelihood of type I errors. 
 
