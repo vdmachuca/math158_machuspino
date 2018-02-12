@@ -76,7 +76,7 @@ We expected a stronger linear relationship between number of absences and final 
 
 ### Simultaneous Inference
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 working.hotelling.bonferroni.intervals <- function(x, y) {
   y <- as.matrix(y)
   x <- as.matrix(x)
