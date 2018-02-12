@@ -79,6 +79,6 @@ tidy(filteredG3_lm, conf.int = TRUE, conf.level = 0.99)
 ```
 The 99% CI for the population slope is now (-0.1591,-0.0104). This interval does not contain 0, so we can be confident that the population slope is not zero - there is a linear relationship between number of absences and final grade. Because we looked at a subset of the explanatory variables, though, the model is only appropriate for fewer than 30 absences.
 
-### ASSESS FIT OF MODEL W/O OUTLIERS ### lol
+### ASSESS FIT OF MODEL W/O OUTLIERS ###
 
 
