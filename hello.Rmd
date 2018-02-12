@@ -17,14 +17,16 @@ library(lattice)
 library(investr)
 library(robustbase)
 require(gridExtra)
-student_por <- read_delim("~/Desktop/MATH158_SLMs/math158_machuspino/student-por.csv", 
+student_por <- read_delim("~/Desktop/math158_machuspino/student-por.csv", 
     ";", escape_double = FALSE, trim_ws = TRUE)
 ```
 
 
-The data we are working with looks at student achievement in a math course and portuguese course at two secondary educa- tion Portuguese schools. A dataset is provided for each course and there are approximately 393 students that overlap with both. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. Our hypothesis is that a linear relationship exists between number of absences (absences) and final grade (G3). More specifically, we’d predict that a negative relationship exists between the two. 
+The data we are working with looks at student achievement a portuguese course at two secondary education Portuguese schools. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. Our hypothesis is that a linear relationship exists between number of absences (absences) and final grade (G3). More specifically, we’d predict that a negative relationship exists between the two.  
 
-We will start out by looking at a plot of the explanatory variable (absences) vs. the reponse variable (G3)
+We will start out by looking at a plot of the 
+
+explanatory variable (absences) vs. the reponse variable (G3)
 
 
 ```{r, eval=TRUE,echo=FALSE, results="hide", fig=TRUE, fig.width=5,fig.height=3}
@@ -37,7 +39,7 @@ and standardized residual vs. fitted grade.
 G3_lm <- lm(G3 ~ absences, data=student_por)
 xyplot(rstandard(G3_lm) ~ fitted(G3_lm), pch=18,xlab="Fitted Grade",ylab="Standardized Residual")
 ```
-There seems to be a negative linear relatinoshios between number of absences and final grade. It is slight, though. To further investigate this possible relationship, we compute a 99% CI for slope parameter $\beta_1$.
+There seems to be a negative linear relationship between number of absences and final grade. It is slight, though. To further investigate this possible relationship, we compute a 99% CI for slope parameter $\beta_1$.
 
 ```{r, eval=TRUE}
 tidy(G3_lm, conf.int = TRUE, conf.level = 0.99)
@@ -55,7 +57,7 @@ tidy(filteredG3_lm, conf.int = TRUE, conf.level = 0.99)
 
 The 99% CI for the population slope is now (-0.1591,-0.0104). This interval does not contain 0, so we can be confident that the population slope is not zero - there is a linear relationship between number of absences and final grade. Because we looked at a subset of the explanatory variables, though, the model is only appropriate for fewer than 30 absences.
 
-The data seem to be fairly symmetric about the model line, but lacks constanct variability. We will now compute a prediction interval for an individual response at an interesting x value.  Let's look at x=15.
+The data seem to be fairly symmetric about the model line, but lacks constant variability. We will now compute a prediction interval for an individual response at an interesting x value.  Let's look at x=15.
 
 ```{r, eval=TRUE}
 newdata = data.frame(absences=15)
@@ -70,7 +72,7 @@ summary(filteredG3_lm)$r.squared
 
 We get an $R^2$ value of 0.013. This tells us that number of absences explains 1.3% of variability in final grades - quite a small percentage. 
 
-We expected a stronger linear relationship between number of absences and final grade. It's safe to say that number absences is likely related to other variables in the data set. In the future, then, we'd like to explore colinearity between absences and other variables like travel time, number of past class failures, and quality of family relationships.  We are interested in exploring the relationship between parent education and student school performance. The former may indicate whether or not a student who grew up in a family environment that promotes education, which might affect that student's performance. 
+We expected a stronger linear relationship between number of absences and final grade. It's safe to say that number absences is likely related to other variables in the data set. In the future, then, we'd like to explore colinearity between absences and other variables like travel time, number of past class failures, and quality of family relationships.  We are also interested in exploring the relationship between parent education and student school performance. The former may indicate whether or not a student who grew up in a family environment that promotes education, which might affect that student's performance. 
 
 ### Simultaneous Inference
 
