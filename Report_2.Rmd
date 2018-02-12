@@ -27,16 +27,13 @@ absences vs. final grade plot using ggplot
 ggplot(student_por, aes(absences, G3)) + geom_point() + geom_smooth(method='lm') 
 ```
 
-absences vs. final grade plot and residual vs. predicted using xyplot
+residual vs. predicted using xyplot
 ```{r, eval=FALSE}
 G3_lm <- lm(G3 ~ absences, data=student_por)
-xyplot(G3 ~ absences, data=student_por, type=c("p", "r"), pch=18)
 xyplot(rstandard(G3_lm) ~ fitted(G3_lm), pch=18)
 ```
-Strange. The second plot seems to be the mirror immage of the first. Am I doing something wrong? Anyway, there seems to be a negative linear relatinoshios between number of absences and final grade. It is slight, though. 
-***
-continue checking assumptions. figure out residual xyplot. 
-***
+There seems to be a negative linear relatinoshios between number of absences and final grade. It is slight, though. 
+
 
 99% CI for slope parameter $\beta_1$
 
@@ -44,28 +41,6 @@ continue checking assumptions. figure out residual xyplot.
 tidy(G3_lm, conf.int = TRUE, conf.level = 0.99)
 ```
 The CI is (-0.134, 0.0067). It contains zero, so we cannot be confident that the population slope is not zero. That is, there may not be a linear relationship between number of absences and final grade. Let's try transforming the variables, and then removing some outliers.
-
-### TRANSFORMED VARIABLES ###
-
-
-```{r, eval=FALSE}
-student_por2<-filter(student_por, absences > 0 & G3 > 0)
-ggplot(student_por2, aes(log(absences), G3)) + geom_point() 
-
-G3_lm2 <- lm(G3 ~ log(absences), data=student_por2)
-tidy(G3_lm2, conf.int = TRUE, conf.level = 0.99)
-```
-
-
-```{r, eval=FALSE}
-ggplot(student_por2, aes(absences, log(G3))) + geom_point() 
-
-G3_lm3 <- lm(log(G3) ~ absences, data=student_por2)
-tidy(G3_lm3, conf.int = TRUE, conf.level = 0.99)
-```
-
-Mmmmm, I don't like this. Let's try filtering out outliers! 
-
 
 ### REMOVING OUTLIERS ###
 
