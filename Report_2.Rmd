@@ -17,16 +17,14 @@ library(lattice)
 library(investr)
 library(robustbase)
 require(gridExtra)
-student_por <- read_delim("~/Desktop/math158_machuspino/student-por.csv", 
+student_por <- read_delim("~/Desktop/MATH158_SLMs/math158_machuspino/student-por.csv", 
     ";", escape_double = FALSE, trim_ws = TRUE)
 ```
 
 
 The data we are working with looks at student achievement a portuguese course at two secondary education Portuguese schools. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. Our hypothesis is that a linear relationship exists between number of absences (absences) and final grade (G3). More specifically, we’d predict that a negative relationship exists between the two.  
 
-We will start out by looking at a plot of the 
-
-explanatory variable (absences) vs. the reponse variable (G3)
+We will start out by looking at a plot of the explanatory variable (absences) vs. the reponse variable (G3)
 
 
 ```{r, eval=TRUE,echo=FALSE, results="hide", fig=TRUE, fig.width=5,fig.height=3}
