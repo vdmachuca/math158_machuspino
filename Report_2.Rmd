@@ -5,8 +5,8 @@ date: "2/12/2018"
 output: pdf_document
 ---
 
-```{r global_options, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r global_options, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width=5,fig.height=3, fig.align='center')
 library(skimr)
 library(ggplot2)
 library(dplyr)
@@ -17,66 +17,66 @@ library(lattice)
 library(investr)
 library(robustbase)
 require(gridExtra)
+student_por <- read_delim("~/Desktop/MATH158_SLMs/math158_machuspino/student-por.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
 ```
 
-Our hypothesis is that a linear relationship exists between number of absences (absences) and final grade (G3). More specifically, we’d predict that a negative relationship exists between the two.  
 
-### UNTRANSFORMED VARIABLES ###
+The data we are working with looks at student achievement in a math course and portuguese course at two secondary educa- tion Portuguese schools. A dataset is provided for each course and there are approximately 393 students that overlap with both. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. Our hypothesis is that a linear relationship exists between number of absences (absences) and final grade (G3). More specifically, we’d predict that a negative relationship exists between the two. 
 
-absences vs. final grade plot using ggplot
+We will start out by looking at a plot of the explanatory variable (absences) vs. the reponse variable (G3)
 
-```{r, eval=FALSE}
-ggplot(student_por, aes(absences, G3)) + geom_point() + geom_smooth(method='lm') 
+
+```{r, eval=TRUE,echo=FALSE, results="hide", fig=TRUE, fig.width=5,fig.height=3}
+ggplot(student_por, aes(absences, G3)) + geom_point() + geom_smooth(method='lm') + labs(x="Absences",y="Final Grade")
 ```
 
-residual vs. predicted using xyplot
-```{r, eval=FALSE}
+and standardized residual vs. fitted grade.
+
+```{r, eval=TRUE, fig.width=5,fig.height=3}
 G3_lm <- lm(G3 ~ absences, data=student_por)
-xyplot(rstandard(G3_lm) ~ fitted(G3_lm), pch=18)
+xyplot(rstandard(G3_lm) ~ fitted(G3_lm), pch=18,xlab="Fitted Grade",ylab="Standardized Residual")
 ```
-There seems to be a negative linear relatinoshios between number of absences and final grade. It is slight, though. 
+There seems to be a negative linear relatinoshios between number of absences and final grade. It is slight, though. To further investigate this possible relationship, we compute a 99% CI for slope parameter $\beta_1$.
 
-
-99% CI for slope parameter $\beta_1$
-
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 tidy(G3_lm, conf.int = TRUE, conf.level = 0.99)
 ```
 The CI is (-0.134, 0.0067). It contains zero, so we cannot be confident that the population slope is not zero. That is, there may not be a linear relationship between number of absences and final grade. Let's try transforming the variables, and then removing some outliers.
 
-### REMOVING OUTLIERS ###
-
 Let's remove the final grades for student who were absent 30 or more times - 2 outliers in total.
 
-```{r, eval=FALSE}
+```{r, eval=TRUE, fig.width=5,fig.height=3}
 student_porfiltered<- filter(student_por, absences < 30)
-ggplot(student_porfiltered, aes(absences, G3)) + geom_point() + geom_smooth(method='lm') 
-filteredG3_lm <- lm(G3 ~ absences, data=student_por_28)
+ggplot(student_porfiltered, aes(absences, G3)) + geom_point() + geom_smooth(method='lm') + labs(x="Absences",y="Final Grade")
+filteredG3_lm <- lm(G3 ~ absences, data=student_porfiltered)
 tidy(filteredG3_lm, conf.int = TRUE, conf.level = 0.99)
 ```
-The 99% CI for the population slope is now (-0.1591,-0.0104). This interval does not contain 0, so we can be confident that the population slope is not zero - there is a linear relationship between number of absences and final grade. Because we looked at a subset of the explanatory variables, though, the model is only appropriate for fewer than 30 absences.
 
-### ASSESS FIT OF MODEL W/O OUTLIERS ###
+The 99% CI for the population slope is now (-0.1591,-0.0104). This interval does not contain 0, so we can be confident that the population slope is not zero - there is a linear relationship between number of absences and final grade. Because we looked at a subset of the explanatory variables, though, the model is only appropriate for fewer than 30 absences.
 
 The data seem to be fairly symmetric about the model line, but lacks constanct variability. We will now compute a prediction interval for an individual response at an interesting x value.  Let's look at x=15.
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 newdata = data.frame(absences=15)
 predict(filteredG3_lm, newdata, interval="predict")
 ```
 
-For a student with 15 absences, we get a predicted final grade of 10.9 and prediction interval of (4.58,17.3). This is a very wide interval, as can be expected both of a prediction interval (relative to a CI) and of higher x-value. Now to find the $R^2$. 
+For a student with 15 absences, we get a predicted final grade of 10.9 and prediction interval of (4.58,17.3). This is a very wide interval, as can be expected both of a prediction interval (relative to a CI) and from looking at a relatively high x-value. Now to find the $R^2$. 
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 summary(filteredG3_lm)$r.squared
 ```
 
 We get an $R^2$ value of 0.013. This tells us that number of absences explains 1.3% of variability in final grades - quite a small percentage. 
-We expected a stronger linear relationship between number of absences and final grade. That said, it's safe to say that number absences is likely related to other variables in the data set. In the future, then, we'd like to explore colinearity between absences and other variables like travel time, number of past class failures, and quality of family relationships.  We are interesting in exploring the relationship between parent education and student school performance. The former may indicate whether or not a student who grew up in a family environment that promotes education, which might affect that student's performance. 
+
+We expected a stronger linear relationship between number of absences and final grade. It's safe to say that number absences is likely related to other variables in the data set. In the future, then, we'd like to explore colinearity between absences and other variables like travel time, number of past class failures, and quality of family relationships.  We are interested in exploring the relationship between parent education and student school performance. The former may indicate whether or not a student who grew up in a family environment that promotes education, which might affect that student's performance. 
 
 ### Simultaneous Inference
 
-```{r, eval=TRUE}
+We will now carry out simultaneous inference on $\beta_0$ and $\beta_1$, utilizing a function from https://rpubs.com/aaronsc32/simultaneous-confidence-intervals. The plots below include bands for mean intervals using the Bonferroni method, Working-Hotelling method, and unadjusted CIs. 
+
+```{r, eval=TRUE, echo=FALSE, fig.width=8,fig.height=3}
 working.hotelling.bonferroni.intervals <- function(x, y) {
   y <- as.matrix(y)
   x <- as.matrix(x)
@@ -149,8 +149,9 @@ working.hotelling.bonferroni.intervals <- function(x, y) {
 working.hotelling.bonferroni.intervals(student_porfiltered$absences, student_porfiltered$G3)
 ```
 
+The plots below include bands for prediction intervals using the Bonferroni method, Scheffé method, and unadjusted PIs. 
 
-```{r, eval=FALSE, echo=FALSE, fig.keep=TRUE}
+```{r, eval=TRUE, echo=FALSE, fig.width=8,fig.height=3}
 working.hotelling.bonferroni.pintervals <- function(x, y) {
   y <- as.matrix(y)
   x <- as.matrix(x)
@@ -192,7 +193,7 @@ working.hotelling.bonferroni.pintervals <- function(x, y) {
     geom_line(aes(y=fit, x=x), size=1) + 
     geom_line(aes(x=x, y=wh.upper), colour='blue', linetype='dashed', size=1) + 
     geom_line(aes(x=x, wh.lower), colour='blue', linetype='dashed', size=1) +
-    labs(title='Working-Hotelling')
+    labs(title='Scheffé (Predicted)')
   
   # Plot the Bonferroni intervals
   bonn <- ggplot(xy, aes(x=x, y=y)) + 
@@ -200,7 +201,7 @@ working.hotelling.bonferroni.pintervals <- function(x, y) {
     geom_line(aes(y=fit, x=x), size=1) + 
     geom_line(aes(x=x, y=bon.upper), colour='blue', linetype='dashed', size=1) + 
     geom_line(aes(x=x, bon.lower), colour='blue', linetype='dashed', size=1) +
-    labs(title='Bonferroni')
+    labs(title='Bonferroni (Predicted)')
   
   # Plot the unadjusted intervals
   non <- ggplot(xy, aes(x=x, y=y)) + 
@@ -208,7 +209,7 @@ working.hotelling.bonferroni.pintervals <- function(x, y) {
     geom_line(aes(y=fit, x=x), size=1) + 
     geom_line(aes(x=x, y=non.upper), colour='blue', linetype='dashed', size=1) + 
     geom_line(aes(x=x, non.lower), colour='blue', linetype='dashed', size=1) +
-    labs(title='Unadjusted')
+    labs(title='Unadjusted (Predicted)')
   
   grid.arrange(non, wh, bonn, ncol = 3)
   
@@ -224,5 +225,5 @@ working.hotelling.bonferroni.pintervals(student_porfiltered$absences, student_po
 ```
 
 
-The level of significance, $\alpha$, and power for a single test differs from the level of significance and power for a family of tests. For example, t-statistics based on the same sample data and MSE will be dependent on each other. Adjusting for multiple comparisons allows us to more accurately determine the actual level of significance and power for a family of tests and thus decreases the likelihood of type I errors. 
+The level of significance, $\alpha$, and power for a single test differs from the level of significance and power for a family of tests. For example, t-statistics based on the same sample data and MSE will be dependent on each other. Adjusting for multiple comparisons allows us to more accurately determine the actual level of significance and power for a family of tests and thus decreases the likelihood of type I errors. Thus, simultaneous inference procedues like Bonferroni are preferable when considering multiple comparisons. 
 
