@@ -24,7 +24,7 @@ Our hypothesis is that a linear relationship exists between number of absences (
 absences vs. final grade plot using ggplot
 
 ```{r, eval=FALSE}
-ggplot(student_por, aes(absences, G3)) + geom_point() 
+ggplot(student_por, aes(absences, G3)) + geom_point() + geom_smooth(method='lm') 
 ```
 
 absences vs. final grade plot and residual vs. predicted using xyplot
@@ -73,7 +73,7 @@ Let's remove the final grades for student who were absent 30 or more times - 2 o
 
 ```{r, eval=FALSE}
 student_porfiltered<- filter(student_por, absences < 30)
-ggplot(student_porfiltered, aes(absences, G3)) + geom_point() 
+ggplot(student_porfiltered, aes(absences, G3)) + geom_point() + geom_smooth(method='lm') 
 filteredG3_lm <- lm(G3 ~ absences, data=student_por_28)
 tidy(filteredG3_lm, conf.int = TRUE, conf.level = 0.99)
 ```
