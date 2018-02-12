@@ -22,7 +22,7 @@ student_por <- read_delim("~/Desktop/math158_machuspino/student-por.csv",
 ```
 
 
-The data we are working with looks at student achievement in a math course and portuguese course at two secondary education Portuguese schools. A dataset is provided for each course and there are approximately 393 students that overlap with both. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. Our hypothesis is that a linear relationship exists between number of absences (absences) and final grade (G3). More specifically, we’d predict that a negative relationship exists between the two. 
+The data we are working with looks at student achievement in a math course and portuguese course at two secondary education Portuguese schools. A dataset is provided for each course and there are approximately 393 students that overlap with both. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. Our hypothesis is that a linear relationship exists between number of absences (absences) and final grade (G3). More specifically, we’d predict that a negative relationship exists between the two.  
 
 We will start out by looking at a plot of the explanatory variable (absences) vs. the reponse variable (G3)
 
