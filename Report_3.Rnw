@@ -1,9 +1,91 @@
 \documentclass{article}
 
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\title{Report 3}
+\author{Vanessa Machuca and Luis Espino}
+
 \begin{document}
 \SweaveOpts{concordance=TRUE}
+\maketitle
+
+The data we are working with looks at student achievement a portuguese course at two secondary education Portuguese schools. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. 
+
+<<>>=
+library(skimr)
+library(ggplot2)
+library(dplyr)
+library(broom)
+library(mosaic)
+library(readr)
+library(lattice)
+library(investr)
+library(robustbase)
+require(gridExtra)
+student_por <- read_delim("~/Desktop/math158_machuspino/student-por.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+@
 
 
+Pairs grids
+<<>>=
+pairs(~ G1 + G2 + G3 , data = student_por)
+@
+
+<<>>=
+pairs(G3~ age + absences, data = student_por)
+@
+
+Forward Selection
+<<>>=
+add1(lm(G3~1, data=student_por), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+@
+
+<<>>=
+add1(lm(G3~failures, data=student_por), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+@
+
+<<>>=
+add1(lm(G3~failures+school, data=student_por), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+@
+
+
+<<>>=
+add1(lm(G3~failures+school+higher, data=student_por), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+@
+
+<<>>=
+add1(lm(G3~failures+school+higher+studytime, data=student_por), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+@
+
+<<>>=
+add1(lm(G3~failures+school+higher+studytime+schoolsup, data=student_por), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+@
+
+<<>>=
+add1(lm(G3~failures+school+higher+studytime+schoolsup+Dalc, data=student_por), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+@
+
+<<>>=
+add1(lm(G3~failures+school+higher+studytime+schoolsup+Dalc+health, data=student_por), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+@
+
+<<>>=
+add1(lm(G3~failures+school+higher+studytime+schoolsup+Dalc+health+Fedu, data=student_por), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+@
+
+<<>>=
+fwdselec <- lm(G3~failures+school+higher+studytime+schoolsup+Dalc, data=student_por)
+summary(fwdselec)
+@
+
+
+Interaction
+<<>>=
+inter <- lm(G3 ~ school*higher,data = student_por)
+summary(inter)
+@
 
 
 \end{document}
