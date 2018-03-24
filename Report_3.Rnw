@@ -88,4 +88,9 @@ summary(inter)
 @
 
 
+Questions for Hardin:
+
+We have a few pairs of variables that interact at the .05 sig level. How do you go about choosing which interaction terms to include in your model? 
+
+
 \end{document}
