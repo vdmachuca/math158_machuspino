@@ -296,24 +296,33 @@ summary(inter)
 
 We looked at all the possible interaction terms and the only significant one at the 0.05 value was between workday alcohol consumption, Dalc, and whether or not a student wants to go to higher education. The interaction does not make sense within the context of this problem, so we will omitt it from the model. 
 
+Additionally, based on the VIF values for both models, we do not have a multicolinearity problem. 
+<<>>=
+require(car)
+vif(fwdselec)
+vif(bkwdselec)
+@
+
 
 \section{MODEL SELECTION}
-Let us compare our backwards and forwards selection models with the interaction term. 
+Let us compare our backwards and forwards selection models. 
 
-<<>>=
-pred.col.for <- predict(fwdselec, newdata=col.tst) 
-pred.col.back <- predict(bkwdselec, newdata=col.tst)
 
-sum( (pred.col.for - col.tst$G3)^2)
-
-sum( (pred.col.back - col.tst$G3)^2)
-@
 
 Nested F-Tests
 <<>>=
 summary(fwdselec)
-fwdselec_reduced <- lm(G3~failures+school+sex+higher+health+famrel+Mjob+Dalc, data=col.trn)
+#delete dalc and famrel (least significant)
+fwdselec_reduced <- lm(G3 ~ failures + school + sex + higher + health + Mjob, data=col.trn)
+summary(bkwdselec)
+#delete famrel and Dalc (least significant)
+bkwdselec_reduced <- lm(G3 ~ school + sex + Mjob + failures + higher + health, data = col.trn)
 @
 
+<<>>=
+#compare each with anova
+anova(fwdselec, fwdselec_reduced)
+anova(bkwdselec, bkwdselec_reduced)
+@
 
 \end{document}
