@@ -2,6 +2,11 @@
 
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{lipsum}
+
+\titleformat{\section}
+  {\normalfont\scshape}{\thesection}{1em}{}
 
 \title{Report 3}
 \author{Vanessa Machuca and Luis Espino}
@@ -10,9 +15,11 @@
 \SweaveOpts{concordance=TRUE}
 \maketitle
 
-The data we are working with looks at student achievement a portuguese course at two secondary education Portuguese schools. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. 
+\section{INTRODUCTION}
 
-<<>>=
+The data we are working with looks at student achievement a portuguese course at two secondary education Portuguese schools. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. We want to invest
+
+<<echo=FALSE>>=
 library(skimr)
 library(ggplot2)
 library(dplyr)
@@ -27,56 +34,204 @@ student_por <- read_delim("~/Desktop/math158_machuspino/student-por.csv",
     ";", escape_double = FALSE, trim_ws = TRUE)
 @
 
-
-Pairs grids
 <<>>=
-pairs(~ G1 + G2 + G3 , data = student_por)
-@
-
-<<>>=
-pairs(G3~ age + absences, data = student_por)
-@
-
-
-<<>>=
-#recode studytime 
+#recode studytime to be continous
 student_por_n <- student_por %>% 
   mutate(studytime_num = ifelse(studytime == 1, 1, 
          ifelse(studytime == 2, 3.5,
          ifelse(studytime == 3, 7.5, 12))))
 @
 
+\section{DATA EXPLORATION}
+Let's begin by looking at the pairs plots for four continuous variables- final grade, age, number of absences, and studytime. 
 
+<<>>=
+pairs(G3~ age + absences + studytime_num, data = student_por_n)
+@
 
-Forward Selection
+<<>>=
+cor(student_por_n$absences, student_por_n$studytime_num)
+@
+
+<<>>=
+cor(student_por_n$studytime_num, student_por_n$G3)
+@
+
+From the pairs plot, we see that there is some linear correlation between absences and weekly study time. The correlation coefficient is -0.11, so the correlation is not very strong. We can also see some correlation between weekly time spent studying and final grade, G3. The correlation coefficient is a little higher, at 0.24, yet still relatively weak. Thus, we will not worry too much about multicolinearity.
+
+From the pairs plot, we also observe that the bulk of the observations in the age variable are between ages 15 and 19. Thus, we group all the students who are older than 19 years old together. Additionally, we can also see that there are some outliers within the absences variable. We filter students who have had more than 30 absences. By constricting our data in this way, we also constrict the population we can generalize to. 
+
+<<>>=
+student_por_n<- filter(student_por_n, age < 20)
+student_por_n<- filter(student_por_n, absences < 30)
+@
+
+Notice also that four ordinal variables have a very small number of observations for some of their categories. Number of failures has only 13 observations for 2 and 3 failures each. Thus, we will to lump these categories together. Quality of family relationships, numbered 1-5, with 1 being very bad and 5 being excellent has only 21 and 29 observations for categories 1 and 2. Thus, we will lump categories 1 and 2 together. We will also lump categories 4 and 5 to balance the range of values that variable categories cover for this variable. Thus, category 1 now represents "bad family relationships," category 2 represents "okay family relationships," and category 3 represents "good family relationships." We do the same for the nominal variables workday alcohol consumption, Dalc.For home to school travel time, the categories are as follows: 1 - <15 min., 2 - 15 to 30 min., 3 - 30 min. to 1 hour, or 4 - >1 hour. Category 4 has only 16 observations. Thus, we combine it with category 3 so that category 3 now represents "more than ">30 minutes of travel time."
+
+<<>>=
+student_por_n<-student_por_n %>%
+  mutate(failures=ifelse(failures==2|failures==3,2,failures)) %>%
+  mutate(famrel=ifelse(famrel==1|famrel==2,1,ifelse(famrel==3,2,ifelse(famrel==4|famrel==5,3,famrel))))%>%
+  mutate(Dalc=ifelse(Dalc==1|Dalc==2,1,ifelse(Dalc==3,2,ifelse(Dalc==4|Dalc==5,3,Dalc))))%>%
+  mutate(traveltime=ifelse(traveltime==4,3,traveltime))
+student_por_n<-student_por_n%>%
+  mutate(age=ifelse(age==21|age==22,20,age))
+@
+
+<<>>=
+table(student_por_n$failures)
+table(student_por_n$famrel)
+table(student_por_n$Dalc)
+table(student_por_n$traveltime)
+@
+
+\section{MODEL BUILDING}
+
+Backwards Selection
+<<>>==
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+@
+
+<<results=hide,echo=FALSE>>==
+#delete Medu
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete famsup
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete Pstatus
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete traveltime
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + reason + guardian + studytime_num + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete goout
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + reason + guardian + studytime_num + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete reason
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete internet
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + paid + activities + nursery + higher + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete nursery
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + paid + activities + higher + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete paid
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + activities + higher + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete activities
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete address
+
+drop1(lm(G3~ school + sex + age + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete Walc
+
+drop1(lm(G3~ school + sex + age + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete famsize
+
+drop1(lm(G3~ school + sex + age + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete freetime
+
+drop1(lm(G3~ school + sex + age + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete Fjob
+
+drop1(lm(G3~ school + sex + age + Fedu + Mjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete Mjob
+
+drop1(lm(G3~ school + sex + age + Fedu + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete guardian
+
+drop1(lm(G3~ school + sex + age + Fedu + studytime_num + failures + schoolsup + higher + romantic + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete romantic
+
+drop1(lm(G3~ school + sex + age + Fedu + studytime_num + failures + schoolsup + higher + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete age
+
+drop1(lm(G3~ school + sex + Fedu + studytime_num + failures + schoolsup + higher + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete absences (whyyy...)
+
+drop1(lm(G3~ school + sex + Fedu + studytime_num + failures + schoolsup + higher + famrel + Dalc + health, data=student_por_n),test="F")
+
+#delete sex
+
+drop1(lm(G3~ school + Fedu + studytime_num + failures + schoolsup + higher + famrel + Dalc + health, data=student_por_n),test="F")
+
+#delete famrel
+
+drop1(lm(G3~ school + Fedu + studytime_num + failures + schoolsup + higher + Dalc + health, data=student_por_n),test="F")
+
+#delete Fedu
+
+drop1(lm(G3~ school + studytime_num + failures + schoolsup + higher + Dalc + health, data=student_por_n),test="F")
+
+#delete health
+
+drop1(lm(G3~ school + studytime_num + failures + schoolsup + higher + Dalc, data=student_por_n),test="F")
+
+#delete Dalc
+
+drop1(lm(G3~ school + studytime_num + failures + schoolsup + higher, data=student_por_n),test="F")
+@
+
+Backward Selection Model 
+<<>>=
+bkwdselec <- lm(G3~failures+school+higher+Dalc+studytime_num+schoolsup, data=student_por_n)
+summary(bkwdselec)
+@
+
+Forwards Selection
 <<>>=
 add1(lm(G3~1, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
-@ 
 
-<<results=hide>>=
 add1(lm(G3~failures, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
 
-add1(lm(G3~failures+school, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+add1(lm(G3~failures + school, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
 
-add1(lm(G3~failures+school+higher, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+add1(lm(G3~failures + school + higher, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
 
-add1(lm(G3~failures+school+higher+Dalc, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+add1(lm(G3~failures + school + higher + studytime_num , data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
 
-add1(lm(G3~failures+school+higher+Dalc+studytime_num, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+add1(lm(G3~failures + school + higher + studytime_num + schoolsup, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
 
-add1(lm(G3~failures+school+higher+Dalc+studytime_num+schoolsup, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
+add1(lm(G3~failures + school + higher + studytime_num + schoolsup + Walc, data=student_por_n), G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher  + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, test="F")
 @
 
-Pairs plot between model predictors
-<<>>=
-pairs(G3~failures+school+higher+Dalc+studytime_num+schoolsup, data = student_por_n)
-@
+Forwards Selection Model 
 
-Model 
 <<>>=
-fwdselec <- lm(G3~failures+school+higher+Dalc+studytime_num+schoolsup, data=student_por_n)
+fwdselec <- lm(G3~failures + school + higher + studytime_num + schoolsup + Walc, data=student_por_n)
 summary(fwdselec)
 @
+
+
+
+
+
+
+
+
+
 
 Interaction
 <<>>=
@@ -86,15 +241,13 @@ summary(inter)
 
 As we can see, the interaction terms is quite significant because only a fraction of the students received extra educational support. Thus, having an interaction term between 
 <<>>=
-ggplot(student_por_n, aes(x= failures, y= G3, color=schoolsup)) + geom_point() + geom_smooth(method = 'lm', formula = y~x)
+ggplot(student_por_n, aes(x= failures, y= G3, color=higher)) + geom_point() + geom_smooth(method = 'lm', formula = y~x)
 @
 
-<<>>=
-ggplot(student_por_n, aes(x=schoolsup)) + geom_bar()
-@
 
 Same with schoolsup and studytime 
 
+\section{MODEL SELECTION}
 Nested F-Tests
 
 <<>>=
@@ -107,7 +260,7 @@ b6_reduced <- lm(G3~failures+school+higher+Dalc+studytime_num, data=student_por_
 b5_reduced <- lm(G3~failures+school+higher+Dalc, data=student_por_n) 
 anova(fwdselec, b6_reduced, b5_reduced)
 @
-Because or p-value is low, we reject the null hypotheses that $\beta_5=0$ and $\beta_6 =0$, and we claim that both schoolsup and studytime_num are needed in the model. 
+Because or p-value is low, we reject the null hypotheses that $\beta_5=0$ and $\beta_6 =0$, and we claim that both schoolsup and $studytime_num$ are needed in the model. 
 
 CAN ALSO USE AN F-TEST TO SEE WHETHER INTERACTION IS NEEDED 
 
@@ -117,6 +270,13 @@ CAN ALSO USE AN F-TEST TO SEE WHETHER INTERACTION IS NEEDED
 
 
 
+<<>>=
+table(student_por_n$famrel)
+@
+
+<<>>=
+ggplot(student_por_n, aes(x=Dalc)) + geom_histogram()
+@
 
 
 \end{document}
