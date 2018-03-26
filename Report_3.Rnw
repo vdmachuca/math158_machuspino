@@ -95,6 +95,25 @@ ggplot(student_por_n, aes(x=schoolsup)) + geom_bar()
 
 Same with schoolsup and studytime 
 
+Nested F-Tests
+
+<<>>=
+anova(fwdselec)
+@
+
+See if we can reduce the current model
+<<>>=
+b6_reduced <- lm(G3~failures+school+higher+Dalc+studytime_num, data=student_por_n)
+b5_reduced <- lm(G3~failures+school+higher+Dalc, data=student_por_n) 
+anova(fwdselec, b6_reduced, b5_reduced)
+@
+Because or p-value is low, we reject the null hypotheses that $\beta_5=0$ and $\beta_6 =0$, and we claim that both schoolsup and studytime_num are needed in the model. 
+
+CAN ALSO USE AN F-TEST TO SEE WHETHER INTERACTION IS NEEDED 
+
+
+
+
 
 
 
