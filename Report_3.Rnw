@@ -333,6 +333,9 @@ summary(fwdselec_reduced)
 
 Interesting - "higheryes" has become significant at the 0.001 level, whereas it was not in the full model. This would indicate collinearity. That said, its significance only very slightly increased. Let's continue working with the full model.
 
+
+
+
 \section{MODEL INTERPRETATION AND FIT}
 
 <<echo=FALSE, results=hide>>=
@@ -347,8 +350,15 @@ $$+0.82X_{Mjobhealth}+0.09X_{Mjobother}+0.77X_{Mjobservices}+1.58X_{Mjobteacher}
 All $\beta$ coefficients but for those attached to Mjobother,Mjobservices, and Mjobhealth are significant at the 0.05 level. The $\beta$ coefficients for terms failures, schoolMS, sexM, Dalc, and health are negative, where schoolMS and sexM are binary while failures and health are categorical. This relates students being male, drinking more during the day, having failures more times, having better health and attending Mousinho da Silviera with lower scores. Some of these make intuitive sense, while others, particularly regarding health, do not. On the other hand, students wishing to pursue higher education, having strong family relations, and having a mother who works in health, services, teaching, or other is associated with higher scores. These make a bit more sense. 
 Now let's determine the $R^2$ and $R_{adj.}^2$. 
 
-<<echo=FALSE, results=hide>>=
+Let's calculate the CIs for a mean predicted value and a future predicted value for students who go to Gabriel Pereira and whose mothers work in services.
+<<>>=
+newset <- data.frame(school="GP",Mjob="services")
+predict.lm(fwdselec,newdata=newset,interval = "confidence")
+summary(fwdselec)
+@
 
+<<echo=FALSE, results=hide>>=
+table(student_por_n$Mjob)
 @
 
 \section{SUMMARY}
