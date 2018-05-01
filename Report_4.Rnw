@@ -31,8 +31,8 @@ library(lattice)
 library(investr)
 library(robustbase)
 require(gridExtra)
-student_por <- read_delim("~/Desktop/MATH158_SLMs/math158_machuspino/student-por.csv", 
-    ";", escape_double = FALSE, trim_ws = TRUE)
+require(ISLR)
+require(glmnet)
 @
 
 \section{Task 1 - Sparse and Smooth Linear Models}
@@ -50,7 +50,34 @@ Finally, nominal variables that measured more personal aspect of life included f
 
 # RR and LASSO
 
-We will now run ridge regression and LASSO on the full varaible set, using cross validation to find lambda, and compare them using SSE. 
+We will now run ridge regression (RR) and LASSO on the full varaible set, using cross validation to find lambda, and compare them. First up, RR. 
+
+<<echo=FALSE>>=
+set.seed(47)
+lambda.grid =10^seq(5,-2, length =100)
+
+#remove the response variable and cat. vars. from the data set
+new_student <- student_por_n[-c(1,2,4:6,9:12,16:23,33)]
+
+pr.ridge.cv <-cv.glmnet(as.matrix(new_student), student_por_n$G3,alpha=0, lambda = lambda.grid, standardize=TRUE)
+
+pr.ridge.cv$lambda.min
+@
+
+We omit categorical variables, as RR does not seem to like them very much. The lambda value which yields the lowest SSE is $0.01384886$. Onward to LASSO. 
+
+<<echo=FALSE>>=
+set.seed(47)
+
+pr.lasso.cv <- cv.glmnet(as.matrix(new_student), student_por_n$G3,
+alpha=1, lambda = lambda.grid, standardize=TRUE)
+
+pr.lasso.cv$lambda.min
+@
+
+The lambda value which yields the lowest SSE is $0.04328761$. Now to compare these two models by looking at their coefficients.
+
+
 
 Below is a plot comparing responses predicted using MLR, RR, and LASSO. 
 
