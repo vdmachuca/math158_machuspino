@@ -15,35 +15,13 @@
 \title{Report 3}
 \author{Vanessa Machuca and Luis Espino}
 
+\usepackage{Sweave}
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+\input{Report_4-concordance}
 \maketitle
 
 
-<<echo=FALSE,results=hide>>=
-library(skimr)
-library(ggplot2)
-library(dplyr)
-library(broom)
-library(mosaic)
-library(readr)
-library(lattice)
-library(investr)
-library(robustbase)
-require(gridExtra)
-require(ISLR)
-require(glmnet)
-require(splines)
-@
 
-<<echo=FALSE,results=hide>>=
-student_por <- read_delim("~/Desktop/MATH158_SLMs/math158_machuspino/student-por.csv", 
-    ";", escape_double = FALSE, trim_ws = TRUE)
-student_por_n <- student_por %>% 
-  mutate(studytime_num = ifelse(studytime == 1, 1, 
-         ifelse(studytime == 2, 3.5,
-         ifelse(studytime == 3, 7.5, 12))))
-@
 
 
 \section{Task 1 - Sparse and Smooth Linear Models}
@@ -63,98 +41,71 @@ Finally, nominal variables that measured more personal aspect of life included f
 
 We will now run ridge regression (RR) and LASSO on the full varaible set, using cross validation to find lambda, and compare them. First up, RR. 
 
-<<echo=FALSE>>=
-set.seed(47)
-lambda.grid =10^seq(5,-2, length =100)
-
-#remove the response variable and cat. vars. from the data set
-new_student <- student_por_n[-c(1,2,4:6,9:12,16:23,33)]
-
-pr.ridge.cv <-cv.glmnet(as.matrix(new_student), student_por_n$G3,alpha=0, lambda = lambda.grid, standardize=TRUE)
-
-pr.ridge.cv$lambda.min
-@
+\begin{Schunk}
+\begin{Soutput}
+[1] 0.0225702
+\end{Soutput}
+\end{Schunk}
 
 We omit categorical variables, as RR does not seem to like them very much. The lambda value which yields the lowest SSE is $0.01384886$. Onward to LASSO. 
 
-<<echo=FALSE>>=
-set.seed(47)
-
-pr.lasso.cv <- cv.glmnet(as.matrix(new_student), student_por_n$G3,
-alpha=1, lambda = lambda.grid, standardize=TRUE)
-
-pr.lasso.cv$lambda.min
-@
+\begin{Schunk}
+\begin{Soutput}
+[1] 0.03125716
+\end{Soutput}
+\end{Schunk}
 
 The lambda value which yields the lowest SSE is $0.04328761$. Now to compare these two models by looking at their coefficients. Previously, we looked at plots of cefficients.
 
 MLR 
 
-<<>>=
-fwdselec <- lm(G3 ~ failures + school + sex + higher + health + Mjob, data=student_por_n)
-summary(fwdselec)
-@
+\begin{Schunk}
+\begin{Sinput}
+> fwdselec <- lm(G3 ~ failures + school + sex + higher + health + Mjob, data=student_por_n)
+> summary(fwdselec)
+\end{Sinput}
+\begin{Soutput}
+Call:
+lm(formula = G3 ~ failures + school + sex + higher + health + 
+    Mjob, data = student_por_n)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-12.1608  -1.5552  -0.0308   1.6777   6.9644 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  11.72992    0.49645  23.628  < 2e-16 ***
+failures     -1.55182    0.19375  -8.009 5.47e-15 ***
+schoolMS     -1.47695    0.23563  -6.268 6.72e-10 ***
+sexM         -0.78110    0.22634  -3.451 0.000595 ***
+higheryes     1.95805    0.37591   5.209 2.57e-07 ***
+health       -0.21861    0.07581  -2.884 0.004062 ** 
+Mjobhealth    1.18435    0.47486   2.494 0.012878 *  
+Mjobother     0.17151    0.29723   0.577 0.564130    
+Mjobservices  0.50851    0.34646   1.468 0.142676    
+Mjobteacher   1.04287    0.42005   2.483 0.013294 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.75 on 639 degrees of freedom
+Multiple R-squared:  0.2855,	Adjusted R-squared:  0.2755 
+F-statistic: 28.37 on 9 and 639 DF,  p-value: < 2.2e-16
+\end{Soutput}
+\end{Schunk}
 
 Pairs plot comparing LASSO and RR.
-<<>>=
-coefols <- as.numeric(coef(fwdselec)[c(-1)])
-pr.ridge <- as.numeric(coef(pr.ridge.cv, s="lambda.min")[c(-1)])
-pr.lasso <- as.numeric(coef(pr.lasso.cv, s="lambda.min")[c(-1)])
-compare <- cbind(coefols,pr.ridge,pr.lasso)
-pairs(compare)
-@
+\begin{Schunk}
+\begin{Sinput}
+> coefols <- as.numeric(coef(fwdselec)[c(-1)])
+> pr.ridge <- as.numeric(coef(pr.ridge.cv, s="lambda.min")[c(-1)])
+> pr.lasso <- as.numeric(coef(pr.lasso.cv, s="lambda.min")[c(-1)])
+> compare <- cbind(coefols,pr.ridge,pr.lasso)
+> pairs(compare)
+\end{Sinput}
+\end{Schunk}
 
 The pairs plot shows that the linear model coefficients don’t have high correlation
 with either the ridge regression or lasso coefficients. Most nonzero constants for OLS are very close to zero for ridge regression, and the biggest ridge regression coefficients are not the biggest OLS coefficients. The coefficient plot between lasso and OLS is fairly similar to the coefficient plot between ridge regression and OLS, except the coefficients hug around the line x=0 tighter. Between ridge regression and lasso, most of the coefficients that hug around 0 (on both sides of 0) for ridge are positive and even closer to 0 for lasso. For both plots, only three coefficients seem to be visibly larger relative to all the other ones.
 
 Below is a plot comparing responses predicted using MLR, RR, and LASSO. 
-<<echo=FALSE>>=
-##compare models 
-fwd.pred <- predict(fwdselec, newdata = student_por_n)
-ridge.pred <- predict(pr.ridge, newx = as.matrix(new_student),
-s = "lambda.min")
-lasso.pred <- predict(pr.lasso, newx = as.matrix(new_student),
-s = "lambda.min")
-
-sum((fwd.pred - student_por_n$G3)^2)
-sum((ridge.pred - student_por_n$G3)^2)
-sum((lasso.pred - student_por_n$G3)^2)
-
-ggplot(new_student, aes(x = student_por_n$G3)) + geom_point(aes(y = ridge.pred, colour = "ridge.pred"), fill = "blue", shape=1) + geom_point(aes(y = fwd.pred, colour = "fwd.pred"), fill="orange", alpha = 1/3, shape=1) + geom_point(aes(y = lasso.pred, colour = "lasso.pred"), fill = "green", alpha = 1/5, shape=1) + ylab(label = "Predicted Values") + xlab(label = "Observed Values") 
-@
-
-Now to choose one variable and run smoothing spline and kernel smoother models on it. We change the parameters so that we have four different models for each method. We chose "absences", as this was found to be the most significant variable in report 1.  Let us first use regression splines for four different degrees of freedom: 3,4,5, and 6
-
-<<fig=TRUE, height=3, echo=FALSE>>=
-dislims <- range(student_por_n$absences)
-disgrid=seq(from=dislims[1],to=dislims[2])
-
-for(i in 3:6)
-rs <- lm(G3 ~ bs(absences,df=i,degree=3),data=student_por_n)
-
-rs.pred <- predict(rs,newdata = list(absences=disgrid), se=TRUE)
-rs.se <- cbind(rs.pred$fit +2* rs.pred$se.fit,rs.pred$fit -2*rs.pred$se.fit)
-
-plot(student_por_n$absences, student_por_n$G3, xlim=dislims ,cex =.5, pch=19,col =" darkgrey ", xlab="Absences", ylab="Grade") 
-title(paste(i," = df: SSE=", round(sum(rs$resid^2),3),sep=""),outer =F)
-lines(disgrid, rs.pred$fit ,lwd =2, col =" blue") 
-matlines(disgrid, rs.se ,lwd =1, col =" blue",lty =3)
-@
-
-And now onward to LOESS.
-
-
-
-Without cross validating, we would choose the ___ model. Here's why.
-
-Now to summarize our results for this section. In it, we will comment on anything of interest that occurred. Did anything surprise us? 
-
-\section{Task 2 - Something New}
-
-
-
-\section{Task 3 - Summary}
-
-
-
-\end{document}
