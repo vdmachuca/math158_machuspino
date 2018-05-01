@@ -19,6 +19,7 @@
 \SweaveOpts{concordance=TRUE}
 \maketitle
 
+
 <<echo=FALSE,results=hide>>=
 library(skimr)
 library(ggplot2)
@@ -33,5 +34,38 @@ require(gridExtra)
 student_por <- read_delim("~/Desktop/MATH158_SLMs/math158_machuspino/student-por.csv", 
     ";", escape_double = FALSE, trim_ws = TRUE)
 @
+
+\section{Task 1 - Sparse and Smooth Linear Models}
+
+# Introduction 
+
+The data we are working with looks at student achievement in Portuguese course at two secondary education Portuguese schools. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. The dataset includes demographic variables like student’s school name (binary), sex (binary), age (numeric), and whether the student lives in an urban or rural area. 
+
+It also includes variables that relate to family, including family size, parents cohabitation status (living apart or together), mother and father's education (ordinal), mother and father’s job ('teacher', 'health' care related, civil 'services' (e.g. administrative or police), 'at$\_$home' or 'other'), student’s guardian (mother, father or other), and quality of family relations ($1$ being very bad to $5$ being excellent). 
+
+School-related variables include home to school travel time (ordinal), weekly study time (ordinal), and number of past class failures (1-3 if $n<3$, 4 otherwise). For each of two courses, students were given a graded after the first and second period as well as a final grade.  
+Academic routine, habits and performance were also measured. These variables included travel time from home to school (nominal), weekly study time (nominal), number of past class failures (nominal), reason to choose school (categorical), and number of absences (numeric). Additionally, educational resources were assessed through binary measurements of extra educational support, family educational support, extra paid classes within the course subject, extracurricular activities, attended nursery school, college aspiration, and home internet access.
+
+Finally, nominal variables that measured more personal aspect of life included frequency of outings with friends, workday alcohol consumption, weekend alcohol consumption, current health status, and being in a romantic relationship (binary). 
+
+# RR and LASSO
+
+We will now run ridge regression and LASSO on the full varaible set, using cross validation to find lambda, and compare them using SSE. 
+
+Below is a plot comparing responses predicted using MLR, RR, and LASSO. 
+
+Now to choose one variable and run smoothing pline and kernel smoother models on it. We change the parameters so that we have four different models for each method.
+
+Without cross validating, we would choose the ___ model. Here's why.
+
+Now to summarize our results for this section. In it, we will comment on anything of interest that occurred. Did anything surprise us? 
+
+\section{Task 2 - Something New}
+
+
+
+\section{Task 3 - Summary}
+
+
 
 \end{document}

@@ -1,0 +1,623 @@
+---
+title: "Test"
+author: "Vanessa Machuca"
+date: "3/18/2018"
+output: pdf_document
+---
+
+```{r global_options, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width=5,fig.height=3, fig.align='center')
+library(skimr)
+library(ggplot2)
+library(dplyr)
+library(broom)
+library(mosaic)
+library(readr)
+library(lattice)
+library(investr)
+library(robustbase)
+require(gridExtra)
+student_por <- read_delim("~/Desktop/MATH158_SLMs/math158_machuspino/student-por.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+```
+
+
+```{r, echo=FALSE}
+pairs(~famrel+freetime+goout++health+G3, data=student_por)
+```
+
+```{r, echo=FALSE}
+int<-lm(G3 ~ Medu*famsup, data=student_por)
+summary(int)
+```
+
+
+Time for some backward selection
+
+```{r, echo=FALSE}
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por),test="F")
+
+#delete famsup 
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por),test="F")
+
+#delete Medu
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por),test="F")
+
+#delete traveltime
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Fedu + Mjob + Fjob + reason + guardian + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por),test="F")
+
+#delete Pstatus
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + reason + guardian + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por),test="F")
+
+#delete goout 
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + reason + guardian + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por),test="F")
+
+#delete reason   
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por),test="F")
+
+#delete nursery 
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime + failures + schoolsup + paid + activities + higher + internet + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por),test="F")
+
+#delete Walc 
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime + failures + schoolsup + paid + activities + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=student_por),test="F")
+
+#delete paid 
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime + failures + schoolsup + activities + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=student_por),test="F")
+
+#delete internet 
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime + failures + schoolsup + activities + higher + romantic + famrel + freetime + Dalc + health + absences, data=student_por),test="F")
+
+#delete activities
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + health + absences, data=student_por),test="F")
+
+#delete address 
+
+drop1(lm(G3~ school + sex + age + famsize + Fedu + Mjob + Fjob + guardian + studytime + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + health + absences, data=student_por),test="F")
+
+#delete famsize
+
+drop1(lm(G3~ school + sex + age + Fedu + Mjob + Fjob + guardian + studytime + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + health + absences, data=student_por),test="F")
+
+#delete freetime 
+
+drop1(lm(G3~ school + sex + age + Fedu + Mjob + Fjob + guardian + studytime + failures + schoolsup + higher + romantic + famrel + Dalc + health + absences, data=student_por),test="F")
+
+#delete famrel
+
+drop1(lm(G3~ school + sex + age + Fedu + Mjob + Fjob + guardian + studytime + failures + schoolsup + higher + romantic + Dalc + health + absences, data=student_por),test="F")
+
+#delete guardian 
+
+drop1(lm(G3~ school + sex + age + Fedu + Mjob + Fjob + studytime + failures + schoolsup + higher + romantic + Dalc + health + absences, data=student_por),test="F")
+
+#delete Mjob 
+
+drop1(lm(G3~ school + sex + age + Fedu + Fjob + studytime + failures + schoolsup + higher + romantic + Dalc + health + absences, data=student_por),test="F")
+
+#delete Fjob
+
+drop1(lm(G3~ school + sex + age + Fedu + studytime + failures + schoolsup + higher + romantic + Dalc + health + absences, data=student_por),test="F")
+
+#delete absences
+
+drop1(lm(G3~ school + sex + age + Fedu + studytime + failures + schoolsup + higher + romantic + Dalc + health, data=student_por),test="F")
+
+#delete age 
+
+drop1(lm(G3~ school + sex + Fedu + studytime + failures + schoolsup + higher + romantic + Dalc + health, data=student_por),test="F")
+
+#delete romantic
+
+drop1(lm(G3~ school + sex + Fedu + studytime + failures + schoolsup + higher + Dalc + health, data=student_por),test="F")
+
+#delete sex
+
+drop1(lm(G3~ school + Fedu + studytime + failures + schoolsup + higher + Dalc + health, data=student_por),test="F")
+
+#the model above is good at the 0.01 level
+#we'll now continue at alpha=0.001
+
+#delete Fedu
+
+drop1(lm(G3~ school + studytime + failures + schoolsup + higher + Dalc + health, data=student_por),test="F")
+
+#delete health
+
+drop1(lm(G3~ school + studytime + failures + schoolsup + higher + Dalc, data=student_por),test="F")
+
+#above is the model for alpha = 0.001
+
+```
+
+This algorithm gave me a 0.01 model with 8 variables: school, Fedu, studytime, failures, schoolsup, higher, Dalc, and health.
+
+studytime - 4 levels
+
+And a 0.001 model with 6 variables: 
+school, 
+studytime, 
+failures, 
+schoolsup, 
+higher, 
+Dalc. 
+Add those 3 binary variables for studytime - 9 variables. 
+We're going to ask Hardin about how to deal with studytime. 
+
+
+```{r, echo=FALSE}
+pairs(~studytime+failures+Dalc+G3, data=student_por)
+```
+
+studytime, schoolsup, Dalc
+```{r, echo=FALSE}
+int<-lm(G3 ~ failures*schoolsup, data=student_por)
+summary(int)
+```
+
+
+
+studytime-Dalc: 0.152
+schoolsup-school: 0.148
+school-failures: 0.494
+school-higher: 0.101
+higher-failures: 0.043
+schoolsup-Dalc: 0.0466
+
+studytime-schoolsup: 0.0275
+schoolsup-failures: 0.0203
+
+How do we choose which interaction terms to include, if any? Those last two are the most significant. So let's thing about what adding either or both would mean. 
+
+
+But first, let us recode the variable studytime.
+
+```{r}
+student_por_n <- student_por %>% 
+mutate(studytime_num = ifelse(studytime == 1, 1, 
+ifelse(studytime == 2, 3.5,
+ifelse(studytime == 3, 7.5, 12))))
+```
+
+```{r}
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + famsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete famsup
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete Medu
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete traveltime
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Fedu + Mjob + Fjob + reason + guardian + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete Pstatus
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + reason + guardian + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete goout
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + reason + guardian + studytime + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete reason 
+
+```
+
+Well, we get the same six variables.
+
+```{r}
+int<-lm(G3 ~ failures*schoolsup, data=student_por_n)
+summary(int)
+```
+
+schoolMS-studytime_num: 0.545
+schoolMS-failures: 0.494
+schoolMS-schoolsup: 0.148
+studytime_num-failures: 0.0.23
+
+studytime_num-schoolsup: 0.0276 ***
+failures-schoolsup: 0.0203 ***
+
+1=yes and 0=no for schoolsup variable 
+
+Hmm, so the beta for studytime_num-schoolsup is negative, but for failures-schoolsup is 
+
+```{r}
+
+pairs(~G3+failures+studytime_num, data = student_por_n)
+```
+
+
+Many of these variables are quite skewed. Should we omit those which are the most so? 
+
+
+```{r}
+table(student_por_n$Dalc)
+```
+
+We will now decide which variables to omit.  We are ommitting Dalc, Famrel.
+
+
+Let's do some more data exploration:
+
+```{r}
+student_por_n %>%
+  summary(n())
+
+ggplot(student_por_n,aes(y=G3,x=absences))+geom_point()
+
+```
+
+There are outliers for absences. Let's take them out!
+
+```{r}
+student_por_n<- filter(student_por_n, absences < 30)
+
+ggplot(student_por_n,aes(y=G3,x=failures))+geom_point()
+```
+
+
+Let's re-group our four problem variables: failures, Famrel, Dalc, and traveltime:
+
+```{r}
+student_por_n<-student_por_n %>%
+  mutate(failures=ifelse(failures==2|failures==3,2,failures)) %>%
+  mutate(famrel=ifelse(famrel==1|famrel==2,1,ifelse(famrel==3,2,ifelse(famrel==4|famrel==5,3,famrel))))%>%
+  mutate(Dalc=ifelse(Dalc==1|Dalc==2,1,ifelse(Dalc==3,2,ifelse(Dalc==4|Dalc==5,3,Dalc))))%>%
+  mutate(traveltime=ifelse(traveltime==4,3,traveltime))
+```
+
+Let's check to see if all is as it should be, using table. 
+Ok, did it. We're good. Moving on.
+
+```{r}
+table(student_por_n$age)
+```
+
+```{r}
+student_por_n<-student_por_n%>%
+  mutate(age=ifelse(age==21|age==22,20,age))
+```
+
+```{r}
+table(student_por_n$studytime_num)
+```
+Now to build this model!
+
+```{r}
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete Medu
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete famsup
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete Pstatus
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete traveltime
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + reason + guardian + studytime_num + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete goout
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + reason + guardian + studytime_num + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete reason
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete internet
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + paid + activities + nursery + higher + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete nursery
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + paid + activities + higher + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete paid
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + activities + higher + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete activities
+
+drop1(lm(G3~ school + sex + age + address + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete address
+
+drop1(lm(G3~ school + sex + age + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + Walc + health + absences, data=student_por_n),test="F")
+
+#delete Walc
+
+drop1(lm(G3~ school + sex + age + famsize + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete famsize
+
+drop1(lm(G3~ school + sex + age + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + freetime + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete freetime
+
+drop1(lm(G3~ school + sex + age + Fedu + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete Fjob
+
+drop1(lm(G3~ school + sex + age + Fedu + Mjob + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete Mjob
+
+drop1(lm(G3~ school + sex + age + Fedu + guardian + studytime_num + failures + schoolsup + higher + romantic + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete guardian
+
+drop1(lm(G3~ school + sex + age + Fedu + studytime_num + failures + schoolsup + higher + romantic + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete romantic
+
+drop1(lm(G3~ school + sex + age + Fedu + studytime_num + failures + schoolsup + higher + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete age
+
+drop1(lm(G3~ school + sex + Fedu + studytime_num + failures + schoolsup + higher + famrel + Dalc + health + absences, data=student_por_n),test="F")
+
+#delete absences (whyyy...)
+
+drop1(lm(G3~ school + sex + Fedu + studytime_num + failures + schoolsup + higher + famrel + Dalc + health, data=student_por_n),test="F")
+
+#delete sex
+
+drop1(lm(G3~ school + Fedu + studytime_num + failures + schoolsup + higher + famrel + Dalc + health, data=student_por_n),test="F")
+
+#delete famrel
+
+drop1(lm(G3~ school + Fedu + studytime_num + failures + schoolsup + higher + Dalc + health, data=student_por_n),test="F")
+
+#delete Fedu
+
+drop1(lm(G3~ school + studytime_num + failures + schoolsup + higher + Dalc + health, data=student_por_n),test="F")
+
+#delete health
+
+drop1(lm(G3~ school + studytime_num + failures + schoolsup + higher + Dalc, data=student_por_n),test="F")
+
+#delete Dalc
+
+drop1(lm(G3~ school + studytime_num + failures + schoolsup + higher, data=student_por_n),test="F")
+
+```
+
+At the 0.001 level, we get the following variables in our model:
+school
+studytime_num
+failures
+schoolsup
+higher
+
+Luis is doing forward selection. I shall now use best subsets to generate another model.
+
+```{r}
+student_por_n<-student_por_n1
+```
+
+```{r}
+require(leaps)
+col.best <- regsubsets(G3 ~school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=student_por_n, nvmax=10, method="exh") 
+col.best.sum <- summary(col.best)
+
+which.min(col.best.sum$cp)
+which.max(col.best.sum$adjr2)
+which.min(col.best.sum$bic)
+```
+
+Model 10 is the best for cp and adjr2.
+
+Model 8 is the best for bic. Let's store them in names. And output the coefficients.
+
+
+```{r}
+best.num.R2 <- which.max(col.best.sum$adjr2) 
+best.num.bic <- which.min(col.best.sum$bic) 
+best.num.cp <- which.min(col.best.sum$cp)
+
+coef(col.best, best.num.R2)
+coef(col.best, best.num.bic)
+coef(col.best, best.num.cp)
+```
+
+
+Model 10:
+school, sex,Medu,Fjobteacher,failures,schoolsupyes,higheryes,Dalc,health, studytime_num
+
+Model 8:
+school,Fedu,failures,schoolsupyes,higheres,Dalc,health,studytime_num
+
+Let us now compare our two models, with the interaction term failers*schoolsup added in.
+
+```{r}
+set.seed(42)
+
+for.col <- lm(G3~ school + studytime_num + failures + schoolsup + higher + Walc + schoolsup*failures, data=col.trn)
+
+back.col <- lm(G3~ school + studytime_num + failures + schoolsup + higher + schoolsup*failures, data=col.trn)
+
+pred.col.for <- predict(for.col, newdata=col.tst) 
+pred.col.back <- predict(back.col, newdata=col.tst)
+
+sum( (pred.col.for - col.tst$G3)^2)
+
+sum( (pred.col.back - col.tst$G3)^2)
+```
+
+Oh no. We need to redo some things let's go.
+But first do this
+
+```{r}
+student_por_n<-student_por_n %>% filter(age<20) %>%
+  filter(absences<30)
+```
+
+```{r}
+set.seed(47)
+col.subset <- sample(c(TRUE, FALSE), nrow(student_por_n), replace=TRUE, prob=c(1/3,2/3))
+col.tst <- student_por_n[col.subset,]
+col.trn <-student_por_n[!col.subset,]
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + reason + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=col.trn),test="F")
+
+#delete reason
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + goout + Dalc + Walc + health + absences, data=col.trn),test="F")
+
+#delete goout
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + guardian + traveltime + studytime_num + failures + schoolsup + famsup + paid + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + Walc + health + absences, data=col.trn),test="F")
+
+#delete paid
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + guardian + traveltime + studytime_num + failures + schoolsup + famsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + Walc + health + absences, data=col.trn),test="F")
+
+#delete Walc
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + Mjob + Fjob + guardian + traveltime + studytime_num + failures + schoolsup + famsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=col.trn),test="F")
+
+#delete Fedu
+
+drop1(lm(G3~ school + sex + age + address + famsize + Pstatus + Medu + Mjob + Fjob + guardian + traveltime + studytime_num + failures + schoolsup + famsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=col.trn),test="F")
+
+#delete age
+
+drop1(lm(G3~ school + sex + address + famsize + Pstatus + Medu + Mjob + Fjob + guardian + traveltime + studytime_num + failures + schoolsup + famsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=col.trn),test="F")
+
+#delete Medu
+
+drop1(lm(G3~ school + sex + address + famsize + Pstatus + Mjob + Fjob + guardian + traveltime + studytime_num + failures + schoolsup + famsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=col.trn),test="F")
+
+#delete Pstatus
+
+drop1(lm(G3~ school + sex + address + famsize + Mjob + Fjob + guardian + traveltime + studytime_num + failures + schoolsup + famsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=col.trn),test="F")
+
+#delete traveltime
+
+drop1(lm(G3~ school + sex + address + famsize + Mjob + Fjob + guardian + studytime_num + failures + schoolsup + famsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=col.trn),test="F")
+
+#delete Fjob
+
+drop1(lm(G3~ school + sex + address + famsize + Mjob + guardian + studytime_num + failures + schoolsup + famsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=col.trn),test="F")
+
+#delete famsize
+
+drop1(lm(G3~ school + sex + address + Mjob + guardian + studytime_num + failures + schoolsup + famsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=col.trn),test="F")
+
+#famsup
+
+drop1(lm(G3~ school + sex + address + Mjob + guardian + studytime_num + failures + schoolsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=col.trn),test="F")
+
+#delete guardian
+
+drop1(lm(G3~ school + sex + address + Mjob + studytime_num + failures + schoolsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health + absences, data=col.trn),test="F")
+
+#delete absences
+
+drop1(lm(G3~ school + sex + address + Mjob + studytime_num + failures + schoolsup + activities + nursery + higher + internet + romantic + famrel + freetime + Dalc + health, data=col.trn),test="F")
+
+#delete freetime
+
+drop1(lm(G3~ school + sex + address + Mjob + studytime_num + failures + schoolsup + activities + nursery + higher + internet + romantic + famrel + Dalc + health, data=col.trn),test="F")
+
+#delete internet
+
+drop1(lm(G3~ school + sex + address + Mjob + studytime_num + failures + schoolsup + activities + nursery + higher + romantic + famrel + Dalc + health, data=col.trn),test="F")
+
+#delete activities
+
+drop1(lm(G3~ school + sex + address + Mjob + studytime_num + failures + schoolsup + nursery + higher + romantic + famrel + Dalc + health, data=col.trn),test="F")
+
+#delete nursery
+
+drop1(lm(G3~ school + sex + address + Mjob + studytime_num + failures + schoolsup + higher + romantic + famrel + Dalc + health, data=col.trn),test="F")
+
+#delete address
+
+drop1(lm(G3~ school + sex + Mjob + studytime_num + failures + schoolsup + higher + romantic + famrel + Dalc + health, data=col.trn),test="F")
+
+#delete romantic
+
+drop1(lm(G3~ school + sex + Mjob + studytime_num + failures + schoolsup + higher + famrel + Dalc + health, data=col.trn),test="F")
+
+#delete schoolsup
+
+drop1(lm(G3~ school + sex + Mjob + studytime_num + failures + higher + famrel + Dalc + health, data=col.trn),test="F")
+
+#delete studytime_num
+
+drop1(lm(G3~ school + sex + Mjob + failures + higher + famrel + Dalc + health, data=col.trn),test="F")
+######good at 0.05
+
+#delete famrel
+
+drop1(lm(G3~ school + sex + Mjob + failures + higher + Dalc + health, data=col.trn),test="F")
+
+
+#delete Dalc
+
+drop1(lm(G3~ school + sex + Mjob + failures + higher + health, data=col.trn),test="F")
+
+
+#delete Mjob
+
+
+drop1(lm(G3~ school + sex + failures + higher + health, data=col.trn),test="F")
+
+#delete health
+
+drop1(lm(G3~ school + sex + failures + higher, data=col.trn),test="F")
+
+```
+
+
+Now to compare the models
+
+```{r}
+back.col <- lm(G3~ school + sex + Mjob + failures + higher + famrel + Dalc + health + higher*dalc, data=col.trn)
+
+for.col <- lm(G3~ , data=col.trn)
+
+pred.col.for <- predict(for.col, newdata=col.tst) 
+pred.col.back <- predict(back.col, newdata=col.tst)
+
+sum( (pred.col.for - col.tst$G3)^2)
+
+sum( (pred.col.back - col.tst$G3)^2)
+```
+
+LOL jk not needed.
+
+Okay, no we're going to generate a nested model by taking out two of the least significant variables. and then use anove to compare them
+
+```{r}
+require(car)
+vif(fwdselec)
+vif(bkwdselec)
+```
+
+$$E[Y]=12.27-1.98X_{failures}-1.31X_{schoolMS}-1.10X_{sexM}+1.55X_{higheryes}-0.26X_{health}+0.85X_{Mjobhealth}+0.08X_{Mjobother}+0.70X_{Mjobservices}+1.53X_{Mjobteacher} $$
+
+
+
