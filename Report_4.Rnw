@@ -253,6 +253,19 @@ We chose to have 7 principal components in our model based on the CV error. The 
 
 \subsection{Inverse Predictions}
 
+Regression models of Y on X can also be used to make an inverse prediction of X on Y. That is, predicting what X might have resulted in the observed Y value. In the context of our data set, we were interested in making inverse predictions of the variable $studytime_num$ - weekly hours studies - based on a student's grades. This might be useful for recommending study time to achieve certain grades. Obtaining inverse predictions is a matter of a simple reformulation of our usual estimated regression model
+
+$$\hat{Y}=b_{0} + b_{1}X$$
+
+to get 
+
+$$\hat{X}_{h(new)} = \frac{Y_{h(new)}-b_{0}}{b_{1}}$$
+
+<<echo=FALSE>>=
+ggplot(student_por_n,aes(studytime_num,G3))+geom_point()
+@
+
+
 studytime_num - weekly studytime
 
 \subsection{Added Variable Plots}
