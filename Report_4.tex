@@ -26,7 +26,7 @@
 
 \section{Task 1 - Sparse and Smooth Linear Models}
 
-# Introduction 
+Introduction 
 
 The data we are working with looks at student achievement in Portuguese course at two secondary education Portuguese schools. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. The dataset includes demographic variables like student’s school name (binary), sex (binary), age (numeric), and whether the student lives in an urban or rural area. 
 
@@ -37,7 +37,7 @@ Academic routine, habits and performance were also measured. These variables inc
 
 Finally, nominal variables that measured more personal aspect of life included frequency of outings with friends, workday alcohol consumption, weekend alcohol consumption, current health status, and being in a romantic relationship (binary). 
 
-# RR and LASSO
+RR and LASSO
 
 We will now run ridge regression (RR) and LASSO on the full varaible set, using cross validation to find lambda, and compare them. First up, RR. 
 
@@ -47,7 +47,7 @@ We will now run ridge regression (RR) and LASSO on the full varaible set, using 
 \end{Soutput}
 \end{Schunk}
 
-We omit categorical variables, as RR does not seem to like them very much. The lambda value which yields the lowest SSE is $0.01384886$. Onward to LASSO. 
+We omit categorical variables, as RR does not seem to like them very much. The lambda value which yields the lowest SSE is $0.0225702$. Onward to LASSO. 
 
 \begin{Schunk}
 \begin{Soutput}
@@ -55,7 +55,7 @@ We omit categorical variables, as RR does not seem to like them very much. The l
 \end{Soutput}
 \end{Schunk}
 
-The lambda value which yields the lowest SSE is $0.04328761$. Now to compare these two models by looking at their coefficients. Previously, we looked at plots of cefficients.
+The lambda value which yields the lowest SSE is $0.03125716$. Now to compare these two models by looking at their coefficients. Previously, we looked at plots of cefficients.
 
 MLR 
 
@@ -98,9 +98,9 @@ Pairs plot comparing LASSO and RR.
 \begin{Schunk}
 \begin{Sinput}
 > coefols <- as.numeric(coef(fwdselec)[c(-1)])
-> pr.ridge <- as.numeric(coef(pr.ridge.cv, s="lambda.min")[c(-1)])
-> pr.lasso <- as.numeric(coef(pr.lasso.cv, s="lambda.min")[c(-1)])
-> compare <- cbind(coefols,pr.ridge,pr.lasso)
+> coef.ridge <- as.numeric(coef(pr.ridge.cv, s="lambda.min")[c(-1)])
+> coef.lasso <- as.numeric(coef(pr.lasso.cv, s="lambda.min")[c(-1)])
+> compare <- cbind(coefols,coef.ridge,coef.lasso)
 > pairs(compare)
 \end{Sinput}
 \end{Schunk}
@@ -108,4 +108,41 @@ Pairs plot comparing LASSO and RR.
 The pairs plot shows that the linear model coefficients don’t have high correlation
 with either the ridge regression or lasso coefficients. Most nonzero constants for OLS are very close to zero for ridge regression, and the biggest ridge regression coefficients are not the biggest OLS coefficients. The coefficient plot between lasso and OLS is fairly similar to the coefficient plot between ridge regression and OLS, except the coefficients hug around the line x=0 tighter. Between ridge regression and lasso, most of the coefficients that hug around 0 (on both sides of 0) for ridge are positive and even closer to 0 for lasso. For both plots, only three coefficients seem to be visibly larger relative to all the other ones.
 
+
 Below is a plot comparing responses predicted using MLR, RR, and LASSO. 
+\begin{Schunk}
+\begin{Soutput}
+[1] 4832.25
+\end{Soutput}
+\begin{Soutput}
+[1] 992.5012
+\end{Soutput}
+\begin{Soutput}
+[1] 1001.052
+\end{Soutput}
+\end{Schunk}
+
+Now to choose one variable and run smoothing spline and kernel smoother models on it. We change the parameters so that we have four different models for each method. We chose "absences", as this was found to be the most significant variable in report 1.  Let us first use regression splines for four different degrees of freedom: 3,4,5, and 6
+
+\includegraphics{Report_4-009}
+
+\includegraphics{Report_4-010}
+
+And now onward to LOESS.
+
+\includegraphics{Report_4-011}
+
+\includegraphics{Report_4-012}
+
+Without cross validating, we would choose the best model. Here's why.
+Now to summarize our results for this section. In it, we will comment on anything of interest that occurred. Did anything surprise us? 
+
+\section{Task 2 - Something New}
+
+
+
+\section{Task 3 - Summary}
+
+
+
+\end{document}

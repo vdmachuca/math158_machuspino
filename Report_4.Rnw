@@ -48,7 +48,7 @@ student_por_n <- student_por %>%
 
 \section{Task 1 - Sparse and Smooth Linear Models}
 
-# Introduction 
+Introduction 
 
 The data we are working with looks at student achievement in Portuguese course at two secondary education Portuguese schools. We found the data through the UCI Machine Learning Repository. The observational units for the dataset are students. The dataset includes demographic variables like student’s school name (binary), sex (binary), age (numeric), and whether the student lives in an urban or rural area. 
 
@@ -59,7 +59,7 @@ Academic routine, habits and performance were also measured. These variables inc
 
 Finally, nominal variables that measured more personal aspect of life included frequency of outings with friends, workday alcohol consumption, weekend alcohol consumption, current health status, and being in a romantic relationship (binary). 
 
-# RR and LASSO
+RR and LASSO
 
 We will now run ridge regression (RR) and LASSO on the full varaible set, using cross validation to find lambda, and compare them. First up, RR. 
 
@@ -95,7 +95,7 @@ Pairs plot comparing LASSO and RR.
 coefols <- as.numeric(coef(fwdselec)[c(-1)])
 coef.ridge <- as.numeric(coef(pr.ridge.cv, s="lambda.min")[c(-1)])
 coef.lasso <- as.numeric(coef(pr.lasso.cv, s="lambda.min")[c(-1)])
-compare <- cbind(coefols,pr.ridge,pr.lasso)
+compare <- cbind(coefols,coef.ridge,coef.lasso)
 pairs(compare)
 @
 
@@ -126,11 +126,29 @@ ggplot(new_student, aes(x = student_por_n$G3)) + geom_point(aes(y = ridge.pred, 
 Now to choose one variable and run smoothing spline and kernel smoother models on it. We change the parameters so that we have four different models for each method. We chose "absences", as this was found to be the most significant variable in report 1.  Let us first use regression splines for four different degrees of freedom: 3,4,5, and 6
 
 <<fig=TRUE, height=3, echo=FALSE>>=
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 dislims <- range(student_por_n$absences)
 disgrid=seq(from=dislims[1],to=dislims[2])
 
-for(i in 3:6){
+for(i in 3:4){
+rs <- lm(G3 ~ bs(absences,df=i,degree=3),data=student_por_n)
+
+rs.pred <- predict(rs,newdata = list(absences=disgrid), se=TRUE)
+rs.se <- cbind(rs.pred$fit +2* rs.pred$se.fit,rs.pred$fit -2*rs.pred$se.fit)
+
+plot(student_por_n$absences, student_por_n$G3, xlim=dislims ,cex =.5, pch=19,col =" darkgrey ", xlab="Absences", ylab="Grade") 
+title(paste(i," = df: SSE=", round(sum(rs$resid^2),3),sep=""),outer =F)
+lines(disgrid, rs.pred$fit ,lwd =2, col =" blue") 
+matlines(disgrid, rs.se ,lwd =1, col =" blue",lty =3)
+}
+@
+
+<<fig=TRUE, height=3, echo=FALSE>>=
+par(mfrow=c(1,2))
+dislims <- range(student_por_n$absences)
+disgrid=seq(from=dislims[1],to=dislims[2])
+
+for(i in 5:6){
 rs <- lm(G3 ~ bs(absences,df=i,degree=3),data=student_por_n)
 
 rs.pred <- predict(rs,newdata = list(absences=disgrid), se=TRUE)
@@ -146,10 +164,10 @@ matlines(disgrid, rs.se ,lwd =1, col =" blue",lty =3)
 And now onward to LOESS.
 
 <<fig=TRUE, height=3, echo=FALSE>>=
-#par(mfrow=c(2,2))
-spanvals = c(.1,.5,1,2)
+par(mfrow=c(1,2))
+spanvals = c(.6,.75,1,2)
 
-for(i in 1:4){
+for(i in 1:2){
 lr <- loess(G3 ~ absences,span=spanvals[i],data=student_por_n)
 
 lr.pred <- predict(lr,data.frame(absences=disgrid), se=TRUE)
@@ -163,22 +181,23 @@ matlines(disgrid, lr.se ,lwd =1, col =" blue",lty =3)
 @
 
 <<fig=TRUE, height=3, echo=FALSE>>=
-#par(mfrow=c(2,2))
+par(mfrow=c(1,2))
+spanvals = c(.6,.75,1,2)
 
-lr <- loess(G3 ~ absences,span=1,data=student_por_n)
+for(i in 3:4){
+lr <- loess(G3 ~ absences,span=spanvals[i],data=student_por_n)
 
 lr.pred <- predict(lr,data.frame(absences=disgrid), se=TRUE)
 lr.se <- cbind(lr.pred$fit +2* lr.pred$se.fit,lr.pred$fit -2*lr.pred$se.fit)
 
 plot(student_por_n$absences, student_por_n$G3, xlim=dislims ,cex =.5, pch=19,col =" darkgrey ", xlab="Absences", ylab="Grade") 
-title(paste(.1," = span: SSE=", round(sum(lr$resid^2),3),sep=""),outer =F)
+title(paste(spanvals[i]," = span: SSE=", round(sum(lr$resid^2),3),sep=""),outer =F)
 lines(disgrid, lr.pred$fit ,lwd =2, col =" blue") 
 matlines(disgrid, lr.se ,lwd =1, col =" blue",lty =3)
-
+}
 @
 
-Without cross validating, we would choose the ___ model. Here's why.
-
+Without cross validating, we would choose the best model. Here's why.
 Now to summarize our results for this section. In it, we will comment on anything of interest that occurred. Did anything surprise us? 
 
 \section{Task 2 - Something New}
