@@ -66,27 +66,22 @@ We will now run ridge regression (RR) and LASSO on the full varaible set, using 
 <<echo=FALSE>>=
 set.seed(47)
 lambda.grid =10^seq(5,-2, length =100)
-
 #remove the response variable and cat. vars. from the data set
 new_student <- student_por_n[-c(1,2,4:6,9:12,16:23,33)]
-
 pr.ridge.cv <-cv.glmnet(as.matrix(new_student), student_por_n$G3,alpha=0, lambda = lambda.grid, standardize=TRUE)
-
 pr.ridge.cv$lambda.min
 @
 
-We omit categorical variables, as RR does not seem to like them very much. The lambda value which yields the lowest SSE is $0.01384886$. Onward to LASSO. 
+We omit categorical variables, as RR does not seem to like them very much. The lambda value which yields the lowest SSE is $0.0225702$. Onward to LASSO. 
 
 <<echo=FALSE>>=
 set.seed(47)
-
 pr.lasso.cv <- cv.glmnet(as.matrix(new_student), student_por_n$G3,
 alpha=1, lambda = lambda.grid, standardize=TRUE)
-
 pr.lasso.cv$lambda.min
 @
 
-The lambda value which yields the lowest SSE is $0.04328761$. Now to compare these two models by looking at their coefficients. Previously, we looked at plots of cefficients.
+The lambda value which yields the lowest SSE is $0.03125716$. Now to compare these two models by looking at their coefficients. Previously, we looked at plots of cefficients.
 
 MLR 
 
@@ -98,14 +93,19 @@ summary(fwdselec)
 Pairs plot comparing LASSO and RR.
 <<>>=
 coefols <- as.numeric(coef(fwdselec)[c(-1)])
-pr.ridge <- as.numeric(coef(pr.ridge.cv, s="lambda.min")[c(-1)])
-pr.lasso <- as.numeric(coef(pr.lasso.cv, s="lambda.min")[c(-1)])
+coef.ridge <- as.numeric(coef(pr.ridge.cv, s="lambda.min")[c(-1)])
+coef.lasso <- as.numeric(coef(pr.lasso.cv, s="lambda.min")[c(-1)])
 compare <- cbind(coefols,pr.ridge,pr.lasso)
 pairs(compare)
 @
 
 The pairs plot shows that the linear model coefficients don’t have high correlation
 with either the ridge regression or lasso coefficients. Most nonzero constants for OLS are very close to zero for ridge regression, and the biggest ridge regression coefficients are not the biggest OLS coefficients. The coefficient plot between lasso and OLS is fairly similar to the coefficient plot between ridge regression and OLS, except the coefficients hug around the line x=0 tighter. Between ridge regression and lasso, most of the coefficients that hug around 0 (on both sides of 0) for ridge are positive and even closer to 0 for lasso. For both plots, only three coefficients seem to be visibly larger relative to all the other ones.
+
+<<echo=FALSE>>=
+pr.ridge <-glmnet(as.matrix(new_student), student_por_n$G3, alpha=0,lambda = 0.0225702, standardize=TRUE)
+pr.lasso <-glmnet(as.matrix(new_student), student_por_n$G3, alpha=1,lambda = 0.03125716, standardize=TRUE)
+@
 
 Below is a plot comparing responses predicted using MLR, RR, and LASSO. 
 <<echo=FALSE>>=
@@ -126,10 +126,11 @@ ggplot(new_student, aes(x = student_por_n$G3)) + geom_point(aes(y = ridge.pred, 
 Now to choose one variable and run smoothing spline and kernel smoother models on it. We change the parameters so that we have four different models for each method. We chose "absences", as this was found to be the most significant variable in report 1.  Let us first use regression splines for four different degrees of freedom: 3,4,5, and 6
 
 <<fig=TRUE, height=3, echo=FALSE>>=
+par(mfrow=c(2,2))
 dislims <- range(student_por_n$absences)
 disgrid=seq(from=dislims[1],to=dislims[2])
 
-for(i in 3:6)
+for(i in 3:6){
 rs <- lm(G3 ~ bs(absences,df=i,degree=3),data=student_por_n)
 
 rs.pred <- predict(rs,newdata = list(absences=disgrid), se=TRUE)
@@ -139,11 +140,42 @@ plot(student_por_n$absences, student_por_n$G3, xlim=dislims ,cex =.5, pch=19,col
 title(paste(i," = df: SSE=", round(sum(rs$resid^2),3),sep=""),outer =F)
 lines(disgrid, rs.pred$fit ,lwd =2, col =" blue") 
 matlines(disgrid, rs.se ,lwd =1, col =" blue",lty =3)
+}
 @
 
 And now onward to LOESS.
 
+<<fig=TRUE, height=3, echo=FALSE>>=
+#par(mfrow=c(2,2))
+spanvals = c(.1,.5,1,2)
 
+for(i in 1:4){
+lr <- loess(G3 ~ absences,span=spanvals[i],data=student_por_n)
+
+lr.pred <- predict(lr,data.frame(absences=disgrid), se=TRUE)
+lr.se <- cbind(lr.pred$fit +2* lr.pred$se.fit,lr.pred$fit -2*lr.pred$se.fit)
+
+plot(student_por_n$absences, student_por_n$G3, xlim=dislims ,cex =.5, pch=19,col =" darkgrey ", xlab="Absences", ylab="Grade") 
+title(paste(spanvals[i]," = span: SSE=", round(sum(lr$resid^2),3),sep=""),outer =F)
+lines(disgrid, lr.pred$fit ,lwd =2, col =" blue") 
+matlines(disgrid, lr.se ,lwd =1, col =" blue",lty =3)
+}
+@
+
+<<fig=TRUE, height=3, echo=FALSE>>=
+#par(mfrow=c(2,2))
+
+lr <- loess(G3 ~ absences,span=1,data=student_por_n)
+
+lr.pred <- predict(lr,data.frame(absences=disgrid), se=TRUE)
+lr.se <- cbind(lr.pred$fit +2* lr.pred$se.fit,lr.pred$fit -2*lr.pred$se.fit)
+
+plot(student_por_n$absences, student_por_n$G3, xlim=dislims ,cex =.5, pch=19,col =" darkgrey ", xlab="Absences", ylab="Grade") 
+title(paste(.1," = span: SSE=", round(sum(lr$resid^2),3),sep=""),outer =F)
+lines(disgrid, lr.pred$fit ,lwd =2, col =" blue") 
+matlines(disgrid, lr.se ,lwd =1, col =" blue",lty =3)
+
+@
 
 Without cross validating, we would choose the ___ model. Here's why.
 
