@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  1 MAY 2018 22:11
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  2 MAY 2018 15:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -381,28 +381,45 @@ File: Report_4-012.pdf Graphic file (type pdf)
  <use Report_4-012.pdf>
 Package pdftex.def Info: Report_4-012.pdf used on input line 135.
 (pdftex.def)             Requested size: 375.80544pt x 187.9119pt.
- [3 <./Report_4-009.pdf> <./Report_4-010.pdf> <./Report_4-011.pdf>] [4 <./Repor
-t_4-012.pdf>] (./Report_4.aux) ) 
+ [3 <./Report_4-009.pdf> <./Report_4-010.pdf> <./Report_4-011.pdf>]
+Overfull \hbox (0.73067pt too wide) in paragraph at lines 142--143
+\T1/aer/m/n/10 Next, we per-form pric-i-pal com-po-nents re-gres-sion on our da
+ta. Prin-ci-pal com-po-nents re-gres-sion is a dimension-
+ []
+
+[4 <./Report_4-012.pdf>] <Report_4-013.pdf, id=56, 433.62pt x 216.81pt>
+File: Report_4-013.pdf Graphic file (type pdf)
+
+<use Report_4-013.pdf>
+Package pdftex.def Info: Report_4-013.pdf used on input line 160.
+(pdftex.def)             Requested size: 375.80544pt x 187.9119pt.
+ [5 <./Report_4-013.pdf>] (./Report_4.aux) ) 
 Here is how much of TeX's memory you used:
- 3922 strings out of 493089
- 53788 string characters out of 6134842
+ 3940 strings out of 493089
+ 54072 string characters out of 6134842
  212078 words of memory out of 5000000
- 7313 multiletter control sequences out of 15000+600000
- 22225 words of font info for 51 fonts, out of 8000000 for 9000
+ 7324 multiletter control sequences out of 15000+600000
+ 25371 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 38i,6n,26p,659b,286s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/local/texlive/2015/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmcsc10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmr12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/publ
-ic/amsfonts/cm/cmr17.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmsltt10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmtt10.pfb>
-Output written on Report_4.pdf (4 pages, 199885 bytes).
+ 38i,6n,27p,659b,286s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2015/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2015/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/local/texlive/2015/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2015/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2015/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2015/texmf-dist/font
+s/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2015/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2015/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2015/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmsltt10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmtt10.pfb>
+Output written on Report_4.pdf (5 pages, 259062 bytes).
 PDF statistics:
- 74 PDF objects out of 1000 (max. 8388607)
- 51 compressed objects within 1 object stream
+ 108 PDF objects out of 1000 (max. 8388607)
+ 76 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 25 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 30 words of extra memory for PDF output out of 10000 (max. 10000000)
 

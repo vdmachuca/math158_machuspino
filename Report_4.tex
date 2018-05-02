@@ -139,7 +139,37 @@ Now to summarize our results for this section. In it, we will comment on anythin
 
 \section{Task 2 - Something New}
 
+Next, we perform pricipal components regression on our data. Principal components regression is a dimension-reduction technique for regression. Instead of regressing on $p$ predictors, we regress on $M$ principal components, where principal components are linear combinations of the predictors, and ideally $M<<p$. The first part of PCR is principle component analysis, where, through an iterative process, the principle components are found. This process is as follows: 
 
+\begin{enumerate}
+\item Principal component 1 is computed by finding the direction in which the observations vary the most. This is equivalent to finding the line whose distance is shortest to all the observations. 
+\item Principal component 2 is computed by finding the line that is orthogonal to principal component 1 and that points in the direction in which the observations on this orthogonal plane now vary the most. 
+\item Iterate as in step (2) until you've found $p$ principal components. 
+\end{enumerate}
+
+The second part of PCR is to perform a linear regression on the principal components that capture most of your variability. OLS obtains estimates for $\beta_j$ in $$y_i = \beta_0 + \sum \beta_jx_{ij} + \epsilon_i$$ that minimize $$SSE = \sum_{i=1}^{n}\left(Y_i - b_0 - \sum_{j=1}^{p-1}b_jX_{ij}\right)^2$$. On the other hand, PCR obtains estimates for $\beta_j^\prime$ in $$y_i = \beta_0^\prime + \sum_{j=1}^{p\prime}\beta_j^\prime \alpha_{ij} + \epsilon_i$$ that minimize $$SSE = \sum_{i=1}^{n}\left(Y_i - b_0^\prime - \sum_{j=1}^{M-1}b_j^\prime \alpha_{ij}\right)^2$$.
+
+The number of principal components is typically chosen through CV and standardize the predictors before doing PCA ensures that all predictors have equal weight in obtaining the principal components. Otherwise, predictors with higher variance will have a greater impact on the final model.
+
+The idea is that through $M$ principal components, where ideally $M<p$, you can capture most of the variability in the data and the relationship with the response in less dimensions than you would through your $p$ predictors. In this way, PCR also may help prevent overfitting. A key underlying assumption of PCR is that the direction in which the $p$ predictors show the most variation are the directions associated with $Y$. 
+
+PCR is particularly useful for data in which the response can be accurately modeled using only few principal components. We chose PCR because based on our previous models, it seems that most of the variation in our data could potentially be captured in a few components and thus, PCR could give us a more parsimonious model compared to OLS. We also chose it because it could help address any multicolinearity present in our data.
+
+PCR solves issues of multicolinearity, and dimensionality, where the number of observations is less than the number of predictors. 
+
+\includegraphics{Report_4-013}
+
+
+\begin{Schunk}
+\begin{Soutput}
+[1] 7.878287
+\end{Soutput}
+\end{Schunk}
+
+
+We chose to have 7 principal components in our model based on the CV error. The test error for this this number of principal components is 6.92.
+
+\subsection{Inverse Predictions}
 
 \section{Task 3 - Summary}
 
