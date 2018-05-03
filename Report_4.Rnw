@@ -36,6 +36,7 @@ require(glmnet)
 require(splines)
 require(pls)
 require(caret)
+require(chemCal)
 @
 
 <<echo=FALSE,results=hide>>=
@@ -284,6 +285,7 @@ Now to make our inverse predictions:
 inverse.predict(ip.lm,15)
 @
 
+The predicted study time per week for a student with a grade of 15 is 15.46 hours per week. 
 
 Some statisticians argue that it makes more sense to just regress X on Y. We will now do this for $study_time$ and $G3$ and see how these results might differ from what we got above.
 
