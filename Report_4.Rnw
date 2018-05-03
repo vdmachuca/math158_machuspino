@@ -261,12 +261,41 @@ to get
 
 $$\hat{X}_{h(new)} = \frac{Y_{h(new)}-b_{0}}{b_{1}}$$
 
-<<echo=FALSE>>=
+<<>>=
 ggplot(student_por_n,aes(studytime_num,G3))+geom_point()
 @
 
+<<>>=
+ip.lm <- lm(G3 ~ studytime_num, data=student_por_n)
+summary(ip.lm)
+@
 
-studytime_num - weekly studytime
+This gives us the following model
+
+$$\hat{Y}=10.92+0.264X$$
+
+and so 
+
+$$\hat{X}=3.787-41.34Y$$
+
+Now to make our inverse predictions:
+
+<<>>=
+inverse.predict(ip.lm,15)
+@
+
+
+Some statisticians argue that it makes more sense to just regress X on Y. We will now do this for $study_time$ and $G3$ and see how these results might differ from what we got above.
+
+<<>>=
+ggplot(student_por_n,aes(G3,studytime_num))+geom_point()
+ir.lm <- lm(studytime_num ~ G3, data=student_por_n)
+summary(ir.lm)
+@
+
+$$\hat{X}=1.244 + 0.209Y$$
+
+
 
 \subsection{Added Variable Plots}
 
